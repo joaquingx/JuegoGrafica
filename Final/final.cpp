@@ -35,7 +35,7 @@ int main( void )
 
 
   char  resObj[50],resTexture[50];
-  strcpy(resObj,"../Resources/suzanne.obj");
+  strcpy(resObj,"../Resources/suzanne.obj");// ya que es inseguro :'(
   strcpy(resTexture,"../Resources/uvmap.DDS");
   Model< vector< glm::vec3 > , vector< glm::vec2 > > Susana(resObj,resTexture);
   // Get a handle for our "myTextureSampler" uniform

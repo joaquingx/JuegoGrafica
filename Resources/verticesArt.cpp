@@ -8,6 +8,9 @@
 #include <glm/gtc/matrix_transform.hpp>
 using namespace std;
 
+// #ifndef VERTICESART
+// #define VERTICESART
+
 // GLfloat colorCube[] = {
 //   0.583f,  0.771f,  0.014f,
 //   0.609f,  0.115f,  0.436f,
@@ -133,3 +136,5 @@ using namespace std;
 //   -1.0f, 1.0f, 1.0f,
 //   1.0f,-1.0f, 1.0f
 // };
+
+// #endif
