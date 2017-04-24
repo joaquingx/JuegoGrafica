@@ -8,4 +8,5 @@
   $ cd build
   $ cmake ..
   $ make Final
+  $ ./Final
 ```
