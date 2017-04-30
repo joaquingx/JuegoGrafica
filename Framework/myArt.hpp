@@ -11,6 +11,7 @@ public:
   Art();
   ~Art();
   void bindArt();
+  void bindArt(int algo);
   void bindBuffer(int layout,int theSize , bool toDraw, int nTriangles);
 };
 

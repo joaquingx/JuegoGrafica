@@ -6,9 +6,6 @@ in vec3 Position_worldspace;
 in vec3 Normal_cameraspace;
 in vec3 EyeDirection_cameraspace;
 in vec3 LightDirection_cameraspace;
-// in flat Random;
-// in int gl_SampleID;
-
 
 // Ouput data
 out vec3 color;
@@ -18,18 +15,12 @@ uniform sampler2D myTextureSampler;
 uniform mat4 MV;
 uniform vec3 LightPosition_worldspace;
 
-float rand(vec2 co)
-{
-  return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
-}
-
-
 void main(){
 
   // Light emission properties
   // You probably want to put them as uniforms
   vec3 LightColor = vec3(1,1,1);
-  float LightPower = 100.0f;
+  float LightPower = 50.0f;
 
   // Material properties
   vec3 MaterialDiffuseColor = texture( myTextureSampler, UV ).rgb;
@@ -46,58 +37,34 @@ void main(){
   // Cosine of the angle between the normal and the light direction,
   // clamped above 0
   //  - light is at the vertical of the triangle -> 1
-
   //  - light is perpendicular to the triangle -> 0
   //  - light is behind the triangle -> 0
   float cosTheta = clamp( dot( n,l ), 0,1 );
-  //Eye vector (towards the camera)
+
+  // Eye vector (towards the camera)
   vec3 E = normalize(EyeDirection_cameraspace);
   // Direction in which the triangle reflects the light
   vec3 R = reflect(-l,n);
   // Cosine of the angle between the Eye vector and the Reflect vector,
-  // clamped to 0x
+  // clamped to 0
   //  - Looking into the reflection -> 1
   //  - Looking elsewhere -> < 1
   float cosAlpha = clamp( dot( E,R ), 0,1 );
-  // float red1 = rand(vec2(1,10));
-  // float red2 = rand(vec2(2,0));
-  // float red3 = rand(vec2(0,0));
-  // color = vec3(rand(vec2(2,0),rand(vec2(1,0),rand(vec2(0,0)));
-
-  // vec2 st = gl_FragCoord.xy/u_resolution.xy;
-  // float rnd = random( vec2(10,0));
-  // gl_FragColor = vec4(vec3(rnd),1.0);
-
-  //color = (noise3() + 1)/2;
-  float noise = rand(vec2(cosTheta,cosTheta));
-  color = vec3(1,0,0)* clamp(   (1 + sin((cosTheta + noise/2)*50))/2    ,0,1);
-  //color = vec3(1,0,0) * clamp(noise , 0 , 1);
-  //color = vec3(1,0,0);
   // if (cosTheta > 0.9)
   //   color = vec3(1,0,0);
   // else if(cosTheta > 0.6)
-  //   color = vec3(0.6,0,0);
+  //   color = vec3(0.8,0,0);
   // else if (cosTheta > 0.4)
-  //   color = vec3(0.4,0,0);
+  //   color = vec3(0.6,0,0);
   // else
-  //   color = vec3(0.2,0,0);
-  // if(cosAlpha > 0.9)
-  //   color = vec3(1,1,1);
-  //   {
-  //     color = vec3(0.7,0,0);
-  //     else if(cosTheta > 0.4){
-  //       color = vec3(0.4,0,0);
-  //     }
-  //     else
-  //       color = vec3(0,0,0);
-  //   }
-
-  // color =
-  //   // Ambient : simulates indirect lighting
-  //   MaterialAmbientColor +
-  //   // Diffuse : "color" of the object
-  //   MaterialDiffuseColor * LightColor * LightPower * cosTheta / (distance*distance) +
-  //   // Specular : reflective highlight, like a mirror
-  //   MaterialSpecularColor * LightColor * LightPower * pow(cosAlpha,5) / (distance*distance);
+  //   color = vec3(0.4,0,0);
+  color =
+    texture( myTextureSampler, UV ).rgb;
+    // Ambient : simulates indirect lighting
+    // MaterialAmbientColor +
+    // // Diffuse : "color" of the object
+    // MaterialDiffuseColor * LightColor * LightPower * cosTheta / (distance*distance) +
+    // // Specular : reflective highlight, like a mirror
+    // MaterialSpecularColor * LightColor * LightPower * pow(cosAlpha,5) / (distance*distance);
 
 }

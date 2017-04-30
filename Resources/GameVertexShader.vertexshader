@@ -11,14 +11,14 @@ out vec3 Position_worldspace;
 out vec3 Normal_cameraspace;
 out vec3 EyeDirection_cameraspace;
 out vec3 LightDirection_cameraspace;
-// out flat Random;
+out vec3 Random;
 
 // Values that stay constant for the whole mesh.
 uniform mat4 MVP;
 uniform mat4 V;
 uniform mat4 M;
 uniform vec3 LightPosition_worldspace;
-// uniform int randomNumber;
+uniform float Randomness;
 
 void main(){
 
@@ -42,5 +42,5 @@ void main(){
 
   // UV of the vertex. No special space for this one.
   UV = vertexUV;
-  // Random = randomNumber;
+  Random = vec3(Randomness) * vertexPosition_modelspace;
 }

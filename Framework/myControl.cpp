@@ -9,12 +9,22 @@ using namespace glm;
 
 glm::mat4 ViewMatrix;
 glm::mat4 ProjectionMatrix;
+glm::mat4 RotationMatrix;
+glm::vec3 TranslateVector;
+// glm::mat4 ModelMatrix;
 
 glm::mat4 getViewMatrix(){
   return ViewMatrix;
 }
 glm::mat4 getProjectionMatrix(){
   return ProjectionMatrix;
+}
+
+glm::vec3 getTranslateMatrix(){
+  return TranslateVector;
+}
+glm::mat4 getRotationMatrix(){
+  return RotationMatrix;
 }
 
 
@@ -82,4 +92,29 @@ void computeMatrices(){
                                  );
 
   lastTime = currentTime;
+}
+
+void moveShape(){
+  // RotationMatrix = glm::mat4(1.0f);
+  TranslateVector = glm::vec3(0.0f);
+  glm::vec3 toUp = glm::vec3(0.0f,0.0f,0.1f);
+  glm::vec3 toDown = glm::vec3(0.0f,0.0f,-0.1f);
+  glm::vec3 toLeft = glm::vec3(-0.1f,0.0f,0.0f);
+  glm::vec3 toRight = glm::vec3(0.1f,0.0f,0.0f);
+  if (glfwGetKey( window, GLFW_KEY_UP ) == GLFW_PRESS){
+    TranslateVector =  toDown;
+    RotationMatrix = glm::rotate(glm::mat4(1.0f),3.2f,glm::vec3(0,1,0));
+  }
+  if (glfwGetKey( window, GLFW_KEY_DOWN ) == GLFW_PRESS){
+    TranslateVector =  toUp;
+    RotationMatrix = glm::rotate(glm::mat4(1.0f),0.0f,glm::vec3(0,1,0));
+  }
+  if (glfwGetKey( window, GLFW_KEY_RIGHT ) == GLFW_PRESS){
+    TranslateVector =  toRight;
+    RotationMatrix = glm::rotate(glm::mat4(1.0f),1.5f,glm::vec3(0,1,0));
+  }
+  if (glfwGetKey( window, GLFW_KEY_LEFT ) == GLFW_PRESS){
+    TranslateVector =  toLeft;
+    RotationMatrix = glm::rotate(glm::mat4(1.0f),4.7f,glm::vec3(0,1,0));
+  }
 }

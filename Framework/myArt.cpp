@@ -29,6 +29,13 @@ void Art<T>::bindArt(){
 }
 
 template<class T>
+void Art<T>::bindArt(int algo){
+  glGenBuffers(1,&(this->vertexBuffer));
+  glBindBuffer(GL_ARRAY_BUFFER,this->vertexBuffer);
+  glBufferData(GL_ARRAY_BUFFER,this->mySize,this->myArt, GL_STATIC_DRAW);
+}
+
+template<class T>
 void Art<T>::bindBuffer(int layout,int theSize, bool toDraw, int nTriangles){
   glBindBuffer(GL_ARRAY_BUFFER, this->vertexBuffer);
   // cout << GL_ARRAY_BUFFER << " de shapes\n";
@@ -41,7 +48,10 @@ void Art<T>::bindBuffer(int layout,int theSize, bool toDraw, int nTriangles){
                         (void*)0            // array buffer offset
                         );
   if(toDraw)
-    glDrawArrays(GL_TRIANGLES, 0, nTriangles);
+    {
+      // cout << "AFADSASDAS\n";
+      glDrawArrays(GL_TRIANGLES, 0, nTriangles);
+    }
 }
 
 
@@ -109,3 +119,6 @@ void Model<T,T2>::bindModel(int identifier, int TextureID, int layoutVertice,int
 template class Model< vector< glm::vec3 > , vector< glm::vec2 > >;
 template class Shape< vector<glm::vec3> >;
 template class Texture< vector<glm::vec2> >;
+template class Shape< GLfloat * >;
+template class Art<GLfloat * >;
+
