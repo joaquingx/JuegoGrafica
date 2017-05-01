@@ -136,6 +136,7 @@ GLuint loadDDS(const char * imagepath){
   char filecode[4];
   fread(filecode, 1, 4, fp);
   if (strncmp(filecode, "DDS ", 4) != 0) {
+    printf("error en DDS\n");
     fclose(fp);
     return 0;
   }
@@ -148,7 +149,6 @@ GLuint loadDDS(const char * imagepath){
   unsigned int linearSize  = *(unsigned int*)&(header[16]);
   unsigned int mipMapCount = *(unsigned int*)&(header[24]);
   unsigned int fourCC      = *(unsigned int*)&(header[80]);
-
 
   unsigned char * buffer;
   unsigned int bufsize;
@@ -176,7 +176,6 @@ GLuint loadDDS(const char * imagepath){
       free(buffer);
       return 0;
     }
-
   // Create one OpenGL texture
   GLuint textureID;
   glGenTextures(1, &textureID);
@@ -206,7 +205,7 @@ GLuint loadDDS(const char * imagepath){
     }
 
   free(buffer);
-  printf("Texture Loaded Succesfully\n");
+  printf("Texture Loaded Succesfully %s\n",imagepath);
   return textureID;
 
 }

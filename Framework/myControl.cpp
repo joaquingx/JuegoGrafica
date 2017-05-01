@@ -94,6 +94,14 @@ void computeMatrices(){
   lastTime = currentTime;
 }
 
+bool validatePosition(glm::mat4 Modelo, float maxX , float minX , float maxZ, float minZ)
+{
+  float myX = Modelo[3][0], myZ = Modelo[3][2];
+  if(myX > maxX or myX < minX or myZ > maxZ or myZ < minZ)
+    return 0;
+  return 1;
+}
+
 void moveShape(){
   // RotationMatrix = glm::mat4(1.0f);
   TranslateVector = glm::vec3(0.0f);

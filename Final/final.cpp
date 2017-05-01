@@ -9,6 +9,7 @@
 // Include GLM
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include "glm/ext.hpp"
 using namespace glm;
 #include "Framework/myShaders.hpp"
 #include "Framework/myConfiguration.hpp"
@@ -22,81 +23,14 @@ using namespace glm;
 GLFWwindow * window;
 GLuint VertexArrayID;
 
-// GLfloat verticesTriangle[9] = {
-//   -1.0f,0.0f, -1.0f,
-//   1.0f,0.0f, -1.0f,
-//   -1.0f,0.0f,  1.0f
-// };
-
-GLfloat verticesTriangle[] = {
-  -1.0f, -1.0f, 0.0f,
-  1.0f, -1.0f, 0.0f,
-  -1.0f,  1.0f, 0.0f,
-};
-
-// GLfloat verticesPlane[18] = {
-//   -5.0f, -5.0f, 0.0f,
-//   5.0f, -5.0f, 0.0f,
-//   -5.0f,  5.0f, 0.0f,
-//   -5.0f,  5.0f, 0.0f,
-//   5.0f,  -5.0f, 0.0f,
-//   5.0f,  5.0f, 0.0f
-// };
-
-GLfloat verticesPlane[18] = {
-  -1.0f, -1.0f, 0.0f,
-  1.0f, -1.0f, 0.0f,
-  -1.0f,  1.0f, 0.0f,
-  -1.0f,  1.0f, 0.0f,
-  1.0f,  -1.0f, 0.0f,
-  1.0f,  1.0f, 0.0f
-};
-
-GLfloat verticesCube[108] = {
-  -1.0f,-1.0f,-1.0f,
-  -1.0f,-1.0f, 1.0f,
-  -1.0f, 1.0f, 1.0f,
-  1.0f, 1.0f,-1.0f,
-  -1.0f,-1.0f,-1.0f,
-  -1.0f, 1.0f,-1.0f,
-  1.0f,-1.0f, 1.0f,
-  -1.0f,-1.0f,-1.0f,
-  1.0f,-1.0f,-1.0f,
-  1.0f, 1.0f,-1.0f,
-  1.0f,-1.0f,-1.0f,
-  -1.0f,-1.0f,-1.0f,
-  -1.0f,-1.0f,-1.0f,
-  -1.0f, 1.0f, 1.0f,
-  -1.0f, 1.0f,-1.0f,
-  1.0f,-1.0f, 1.0f,
-  -1.0f,-1.0f, 1.0f,
-  -1.0f,-1.0f,-1.0f,
-  -1.0f, 1.0f, 1.0f,
-  -1.0f,-1.0f, 1.0f,
-  1.0f,-1.0f, 1.0f,
-  1.0f, 1.0f, 1.0f,
-  1.0f,-1.0f,-1.0f,
-  1.0f, 1.0f,-1.0f,
-  1.0f,-1.0f,-1.0f,
-  1.0f, 1.0f, 1.0f,
-  1.0f,-1.0f, 1.0f,
-  1.0f, 1.0f, 1.0f,
-  1.0f, 1.0f,-1.0f,
-  -1.0f, 1.0f,-1.0f,
-  1.0f, 1.0f, 1.0f,
-  -1.0f, 1.0f,-1.0f,
-  -1.0f, 1.0f, 1.0f,
-  1.0f, 1.0f, 1.0f,
-  -1.0f, 1.0f, 1.0f,
-  1.0f,-1.0f, 1.0f
-};
-
 int main( void )
 {
+  //Aux Varibales
+  int cnt = 0 ;
   init("Trabajo Final", 1024 , 768 ,window,VertexArrayID);
   // Create and compile our GLSL program from the shaders
   GLuint programID = LoadShaders( "../Resources/GameVertexShader.vertexshader", "../Resources/GameFragmentShader.fragmentshader" );
-  GLuint simpleProgramID = LoadShaders( "../Resources/TransformVertexShader.vertexshader", "../Resources/ColorFragmentShader.fragmentshader" );
+  //GLuint simpleProgramID = LoadShaders( "../Resources/TransformVertexShader.vertexshader", "../Resources/ColorFragmentShader.fragmentshader" );
   // GLuint programID = LoadShaders( "../Resources/LightVertexShader.vertexshader", "../Resources/LightFragmentShader.fragmentshader" );
   // Get a handle for our "MVP" uniform
   GLuint MatrixID = glGetUniformLocation(programID, "MVP");
@@ -118,6 +52,7 @@ int main( void )
   glm::mat4 Modelo      = glm::mat4(1.0f);
 
   glm::mat4 Scale = glm::scale(glm::mat4(1.0f),vec3(4.5f,1.0f,4.5f));
+  // glm::mat4 Scale = glm::mat4(1.0f);
   glm::mat4 ScaleMini = glm::scale(glm::mat4(1.0f),vec3(0.4f));
   // Our ModelViewProjection : multiplication of our 3 matrices
   glm::mat4 MVP        = Projection * View * Scale * Modelo; // Remember, matrix multiplication is the other way around
@@ -128,55 +63,62 @@ int main( void )
   srand(time(NULL));
   // int myTime = rand() % 10000;
 
-  char  resObj[50],resTexture[50];
-  strcpy(resObj,"../Resources/suzanne.obj");// ya que es inseguro :'(
-  strcpy(resTexture,"../Resources/uvmap.DDS");
+  char  resObj[50],resTexture[50], resTexturaRoca[50];
+  strcpy(resObj,"../Resources/suzanne.obj");// ya se que es inseguro :'(
+  strcpy(resTexture,"../Resources/uvmap.DDS");// ya se que es inseguro :'(
+  //strcpy(resTexturaRoca,"../Resources/textureroca.DDS");// ya se que es inseguro :'(
+  // strcpy(resTexturaRoca,"../Resources/uvtemplate.DDS");// ya se que es inseguro :'(
+
+
+  // GLuint TextureRocaID  = glGetUniformLocation(programID, "myTextureSampler");
+
+  //Declaring ShapesTexturesModels
   Model< vector< glm::vec3 > , vector< glm::vec2 > > Susana(resObj,resTexture);
+  Texture<GLfloat * > TexturaRoca(resTexture,sizeof(myUv),myUv);
   Shape<GLfloat * > Cubo(432,verticesCube);  // Get a handle for our "myTextureSampler" uniform
   Shape<GLfloat * > Plano(18*4,verticesPlane);
   Shape<GLfloat * > Triangulo(9*4,verticesTriangle);
-  // cout << Cubo.myArt[0] << "\n";
-  //cout << sizeof(verticesCube) << "\n";
+
+  // Get a handle for our "TEXTURE" uniform
   GLuint TextureID  = glGetUniformLocation(programID, "myTextureSampler");
 
   // Get a handle for our "LightPosition" uniform
   glUseProgram(programID);
   GLuint LightID = glGetUniformLocation(programID, "LightPosition_worldspace");
-
-  glUseProgram(programID);
-  GLuint RandomID = glGetUniformLocation(programID, "Randomness");
-  float myTime = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-  glm::mat4 Movimiento = glm::mat4(1.0f);
   do{
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glUseProgram(simpleProgramID);
+
+    glUseProgram(programID);
     MVP = MVPAUX;
+
+    glm::vec3 lightPos = glm::vec3(4,4,4);
+    glUniform3f(LightID, lightPos.x, lightPos.y, lightPos.z);
+
+    activateAttribs(3);
+    //Drawing Scenario
     glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
     glUniformMatrix4fv(ModelMatrixID, 1, GL_FALSE, &Modelo[0][0]);
     glUniformMatrix4fv(ViewMatrixID, 1, GL_FALSE, &View[0][0]);
-    glUniform1f(RandomID,myTime);
-    glm::vec3 lightPos = glm::vec3(4,4,4);
-    glUniform3f(LightID, lightPos.x, lightPos.y, lightPos.z);
-    activateAttribs(3);
+    TexturaRoca.bindTexture(TextureID,0,1,2);
     Cubo.bindBuffer(0,3,1,36);
-    glUseProgram(programID);
-    // glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
-    glUniformMatrix4fv(ModelMatrixID, 1, GL_FALSE, &Modelo[0][0]);
-    glUniformMatrix4fv(ViewMatrixID, 1, GL_FALSE, &View[0][0]);
+
+
+    //Drawing SUSANA
     moveShape();
     glm::mat4 Rotacion = getRotationMatrix();
     glm::vec3 Movimiento = getTranslateMatrix();
-    //glm::mat4 Rotacion = glm::mat4(1.0f);
-    Modelo = glm::translate(Modelo , Movimiento);
-    // Modelo = translate()
+    glm::mat4 ModeloAux = glm::translate(Modelo , Movimiento);
+    if(validatePosition(ModeloAux,2.5,-2.5,2.5,-2.5))
+      Modelo = ModeloAux;
     MVP = Projection * View * Modelo * Traslacion *  Rotacion * ScaleMini; // * Rotacion ;
+    if(cnt == 99)    cout << glm::to_string(Modelo) << "\n";
+    glUniformMatrix4fv(ModelMatrixID, 1, GL_FALSE, &Modelo[0][0]);
+    glUniformMatrix4fv(ViewMatrixID, 1, GL_FALSE, &View[0][0]);
     glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
-    //Triangulo.bindBuffer(0,3,1,3);
     Susana.bindModel(0,TextureID,0,1,2);
-    //Plano.bindBuffer(0,3,1,6);
 
     deactivateAttribs(3);
-
+    cnt = (cnt + 1)%100;
     // Swap buffers
     glfwSwapBuffers(window);
     glfwPollEvents();
