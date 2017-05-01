@@ -14,6 +14,7 @@ out vec3 color;
 uniform sampler2D myTextureSampler;
 uniform mat4 MV;
 uniform vec3 LightPosition_worldspace;
+uniform bool  forbidden;
 
 void main(){
 
@@ -66,5 +67,6 @@ void main(){
     // MaterialDiffuseColor * LightColor * LightPower * cosTheta / (distance*distance) +
     // // Specular : reflective highlight, like a mirror
     // MaterialSpecularColor * LightColor * LightPower * pow(cosAlpha,5) / (distance*distance);
+    if(forbidden) { color = vec3(0.0f,0.0f,0.0f);}
 
 }

@@ -85,11 +85,13 @@ int main( void )
   // Get a handle for our "LightPosition" uniform
   glUseProgram(programID);
   GLuint LightID = glGetUniformLocation(programID, "LightPosition_worldspace");
+  GLuint forbidden = glGetUniformLocation(programID, "forbidden");
   do{
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glUseProgram(programID);
     MVP = MVPAUX;
+    glUniform1f(forbidden,0);
 
     glm::vec3 lightPos = glm::vec3(4,4,4);
     glUniform3f(LightID, lightPos.x, lightPos.y, lightPos.z);
@@ -102,7 +104,12 @@ int main( void )
     TexturaRoca.bindTexture(TextureID,0,1,2);
     Cubo.bindBuffer(0,3,1,36);
 
+    MVP = Projection * View * glm::translate(glm::mat4(0.1f), glm::vec3(5.0f, 3.0f, 0.0f));
+    glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
+    glUniform1f(forbidden,1);				   
+    Cubo.bindBuffer(0,3,1,36);
 
+    glUniform1f(forbidden,0);
     //Drawing SUSANA
     moveShape();
     glm::mat4 Rotacion = getRotationMatrix();
