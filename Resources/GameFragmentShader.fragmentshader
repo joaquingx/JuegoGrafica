@@ -59,14 +59,17 @@ void main(){
   //   color = vec3(0.6,0,0);
   // else
   //   color = vec3(0.4,0,0);
-  color =
-    texture( myTextureSampler, UV ).rgb;
+  if(forbidden) { color =    texture( myTextureSampler, UV ).rgb;}
+  else
+    color =
+    // texture( myTextureSampler, UV ).rgb;
     // Ambient : simulates indirect lighting
-    // MaterialAmbientColor +
-    // // Diffuse : "color" of the object
-    // MaterialDiffuseColor * LightColor * LightPower * cosTheta / (distance*distance) +
-    // // Specular : reflective highlight, like a mirror
-    // MaterialSpecularColor * LightColor * LightPower * pow(cosAlpha,5) / (distance*distance);
-    if(forbidden) { color = vec3(0.0f,0.0f,0.0f);}
-
+    MaterialAmbientColor +
+    // Diffuse : "color" of the object
+    MaterialDiffuseColor * LightColor * LightPower * cosTheta
+    / (distance*distance) +
+    // Specular : reflective highlight, like a mirror
+    MaterialSpecularColor * LightColor * LightPower *  pow(cosAlpha,5)
+    / (distance*distance);
+    // if(forbidden) { color = vec3(0.0f,0.0f,0.0f);}
 }

@@ -52,6 +52,8 @@ int main( void )
   glm::mat4 Modelo      = glm::mat4(1.0f);
 
   glm::mat4 Scale = glm::scale(glm::mat4(1.0f),vec3(4.5f,1.0f,4.5f));
+  glm::mat4 ScaleLarge = glm::scale(glm::mat4(1.0f),vec3(1.0f,1.0f,4.5f));
+  glm::mat4 ScaleWidth = glm::scale(glm::mat4(1.0f),vec3(4.5f,1.0f,1.0f));
   // glm::mat4 Scale = glm::mat4(1.0f);
   glm::mat4 ScaleMini = glm::scale(glm::mat4(1.0f),vec3(0.4f));
   // Our ModelViewProjection : multiplication of our 3 matrices
@@ -90,9 +92,8 @@ int main( void )
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glUseProgram(programID);
+    glUniform1f(forbidden,1);
     MVP = MVPAUX;
-    glUniform1f(forbidden,0);
-
     glm::vec3 lightPos = glm::vec3(4,4,4);
     glUniform3f(LightID, lightPos.x, lightPos.y, lightPos.z);
 
@@ -104,7 +105,17 @@ int main( void )
     TexturaRoca.bindTexture(TextureID,0,1,2);
     Cubo.bindBuffer(0,3,1,36);
 
-    MVP = Projection * View * glm::translate(glm::mat4(0.1f), glm::vec3(5.0f, 3.0f, 0.0f));
+    MVP = Projection * View * glm::translate(glm::mat4(0.1f), glm::vec3(5.5f, 2.0f, 0.0f)) * ScaleLarge;
+    glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
+    glUniform1f(forbidden,1);				   
+    Cubo.bindBuffer(0,3,1,36);
+
+    MVP = Projection * View * glm::translate(glm::mat4(0.1f), glm::vec3(-5.5f, 2.0f, 0.0f)) * ScaleLarge;
+    glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
+    glUniform1f(forbidden,1);				   
+    Cubo.bindBuffer(0,3,1,36);
+
+    MVP = Projection * View * glm::translate(glm::mat4(0.1f), glm::vec3(0.0f , 2.0f, -5.5f)) * ScaleWidth;
     glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
     glUniform1f(forbidden,1);				   
     Cubo.bindBuffer(0,3,1,36);
