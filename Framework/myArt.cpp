@@ -122,4 +122,3 @@ template class Texture< vector<glm::vec2> >;
 template class Shape< GLfloat * >;
 template class Art<GLfloat * >;
 template class Texture<GLfloat * >;
-

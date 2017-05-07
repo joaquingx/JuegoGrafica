@@ -30,9 +30,7 @@ int main( void )
   init("Trabajo Final", 1024 , 768 ,window,VertexArrayID);
   // Create and compile our GLSL program from the shaders
   GLuint programID = LoadShaders( "../Resources/GameVertexShader.vertexshader", "../Resources/GameFragmentShader.fragmentshader" );
-  //GLuint simpleProgramID = LoadShaders( "../Resources/TransformVertexShader.vertexshader", "../Resources/ColorFragmentShader.fragmentshader" );
-  // GLuint programID = LoadShaders( "../Resources/LightVertexShader.vertexshader", "../Resources/LightFragmentShader.fragmentshader" );
-  // Get a handle for our "MVP" uniform
+  
   GLuint MatrixID = glGetUniformLocation(programID, "MVP");
   GLuint ViewMatrixID = glGetUniformLocation(programID, "V");
   GLuint ModelMatrixID = glGetUniformLocation(programID, "M");
@@ -48,6 +46,7 @@ int main( void )
                                      glm::vec3(0,0,0), // and looks at the origin
                                      glm::vec3(0,1,0)  // Head is up (set to 0,-1,0 to look upside-down)
                                      );
+
   // Model matrix : an identity matrix (model will be at the origin)
   glm::mat4 Modelo      = glm::mat4(1.0f);
 
@@ -76,10 +75,13 @@ int main( void )
 
   //Declaring ShapesTexturesModels
   Model< vector< glm::vec3 > , vector< glm::vec2 > > Susana(resObj,resTexture);
+  Art<GLfloat * >  * Cubo ;// Get a handle for our "myTextureSampler" uniform
+  Cubo = new Shape<GLfloat * >(432,verticesCube);
   Texture<GLfloat * > TexturaRoca(resTexture,sizeof(myUv),myUv);
-  Shape<GLfloat * > Cubo(432,verticesCube);  // Get a handle for our "myTextureSampler" uniform
+  // Shape<GLfloat * > Cubo(432,verticesCube);  // Get a handle for our "myTextureSampler" uniform
   Shape<GLfloat * > Plano(18*4,verticesPlane);
   Shape<GLfloat * > Triangulo(9*4,verticesTriangle);
+  Shape<GLfloat * > Bullet(432,verticesCube);  // Get a handle for our "myTextureSampler" uniform
 
   // Get a handle for our "TEXTURE" uniform
   GLuint TextureID  = glGetUniformLocation(programID, "myTextureSampler");
@@ -103,22 +105,22 @@ int main( void )
     glUniformMatrix4fv(ModelMatrixID, 1, GL_FALSE, &Modelo[0][0]);
     glUniformMatrix4fv(ViewMatrixID, 1, GL_FALSE, &View[0][0]);
     TexturaRoca.bindTexture(TextureID,0,1,2);
-    Cubo.bindBuffer(0,3,1,36);
+    Cubo->bindBuffer(0,3,1,36);
 
     MVP = Projection * View * glm::translate(glm::mat4(0.1f), glm::vec3(5.5f, 2.0f, 0.0f)) * ScaleLarge;
     glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
     glUniform1f(forbidden,1);				   
-    Cubo.bindBuffer(0,3,1,36);
+    Cubo->bindBuffer(0,3,1,36);
 
     MVP = Projection * View * glm::translate(glm::mat4(0.1f), glm::vec3(-5.5f, 2.0f, 0.0f)) * ScaleLarge;
     glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
     glUniform1f(forbidden,1);				   
-    Cubo.bindBuffer(0,3,1,36);
+    Cubo->bindBuffer(0,3,1,36);
 
     MVP = Projection * View * glm::translate(glm::mat4(0.1f), glm::vec3(0.0f , 2.0f, -5.5f)) * ScaleWidth;
     glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
     glUniform1f(forbidden,1);				   
-    Cubo.bindBuffer(0,3,1,36);
+    Cubo->bindBuffer(0,3,1,36);
 
     glUniform1f(forbidden,0);
     //Drawing SUSANA
@@ -134,6 +136,9 @@ int main( void )
     glUniformMatrix4fv(ViewMatrixID, 1, GL_FALSE, &View[0][0]);
     glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
     Susana.bindModel(0,TextureID,0,1,2);
+    
+    if(glfwGetKey(window, GLFW_KEY_SPACE ) == GLFW_PRESS)
+      cout << "sos igual" << "\n";
 
     deactivateAttribs(3);
     cnt = (cnt + 1)%100;
