@@ -90,9 +90,8 @@ int main( void )
 
   list < Bullet< Shape<GLfloat *> > *  >  solidBullets;
   pair<int,int> pos = {0,0};
-  pair<int, int> actdir= {0,0};
+  pair<int, int> actdir= {0,1};
   int newState=GLFW_RELEASE,oldState=GLFW_RELEASE;
-  bool escenario[100][100];
   /*bool escenario[N][M];
     for(int i = 0 ;i < N ; ++i)
     for(int j = 0 ; j < M ; ++j)

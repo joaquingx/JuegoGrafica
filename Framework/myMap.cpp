@@ -3,7 +3,7 @@
 #include <iostream>
 #include <utility>
 #include <vector>
-#define n 100
+#define n 5
 using namespace std;
 
 typedef pair<int,int> pii;

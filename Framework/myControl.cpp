@@ -13,7 +13,7 @@ glm::mat4 ViewMatrix;
 glm::mat4 ProjectionMatrix;
 glm::mat4 RotationMatrix;
 glm::vec3 TranslateVector;
-pair<int , int > direction;
+pair<int , int > direction = {0,1};
 // glm::mat4 ModelMatrix;
 
 glm::mat4 getViewMatrix(){
@@ -150,7 +150,7 @@ pair<int,int> getDirection()
 }
 
 glm::vec3 changeScenario( glm::mat4 modeloAux , pair < int , int >  & pos,
-                          Nodo * escenario[100][100] , int N , int M)
+                          Nodo * escenario[5][5] , int N , int M)
 {
   if(modeloAux[3][0] >= 4.0)
     {
@@ -188,6 +188,7 @@ glm::vec3 changeScenario( glm::mat4 modeloAux , pair < int , int >  & pos,
           return glm::vec3(0.0f,0.0f,-7.5f);
         }
     }
+  return glm::vec3(0.0f);
 
   // float limits[] = {4.0 , -4.0 , -3.3 , 4.5};
   // pair< int, int > direction = { {1,0} , {-1,0} , {0,1} , {0,-1} };
