@@ -47,6 +47,7 @@ add_library(myControl SHARED ${LIBSRC}/myControl.cpp)
 add_library(myTexture SHARED ${LIBSRC}/myTexture.cpp)
 add_library(myObjectLoader SHARED ${LIBSRC}/myObjectLoader.cpp)
 add_library(myArt SHARED ${LIBSRC}/myArt.cpp)
+add_library(myPhisics SHARED ${LIBSRC}/myPhisics.cpp)
 add_library(verticesArt SHARED ${RSRC}/verticesArt.cpp)
 
 set(ALL_LIBS
@@ -60,6 +61,7 @@ set(ALL_LIBS
   myTexture
   verticesArt
   myArt
+  myPhisics
   )
 
 add_executable(Final
@@ -76,6 +78,7 @@ add_executable(Final
   Framework/myObjectLoader.hpp
   Framework/myArt.hpp
   Framework/myArt.cpp
+  Framework/myPhisics.cpp
   # Resources/verticesArt.cpp
   Resources/TransformVertexShader.vertexshader
   Resources/ColorFragmentShader.fragmentshader
