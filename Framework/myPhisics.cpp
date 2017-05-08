@@ -11,6 +11,7 @@
 #include "myArt.hpp"
 #include "myObjectLoader.hpp"
 #include "myTexture.hpp"
+using namespace std;
 
 template<class T>
 class Solid{
@@ -68,6 +69,17 @@ public:
     setModelMatrix();
   }
 
+};
+
+template<class T>
+class Bullet : public Solid<T> {
+public:
+  pair< int,int > dir;
+  Bullet(T * solidArt , glm::mat4 scaleMatrix ,  glm::mat4 rotationMatrix , glm::mat4 traslationMatrix , float solidSize, pair<int ,int > dir ):
+    Solid<T>(solidArt ,scaleMatrix , rotationMatrix , traslationMatrix , solidSize)
+  {
+    this->dir = dir;
+  }
 };
 
 

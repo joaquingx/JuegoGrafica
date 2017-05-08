@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <iostream>
+#include <list>
 // Include GLEW
 #include <GL/glew.h>
 // Include GLFW
@@ -21,7 +22,7 @@ using namespace glm;
 #include "Framework/myArt.hpp"
 #include "Framework/myPhisics.cpp"
 
-const int TAMCUBE = 432, N = 3, M = 3;
+const int TAMCUBE = 432, N = 3, M = 3 ;
 
 
 GLFWwindow * window;
@@ -81,8 +82,13 @@ int main( void )
   // Solid< Shape<GLfloat *> >  solidPlane(new Shape<GLfloat * >(TAMCUBE,verticesCube),glm::mat4(1.0f),10.0f);
   Solid< Shape<GLfloat *> >  solidPlane(new Shape<GLfloat * >(TAMCUBE,verticesCube),glm::scale(glm::mat4(1.0f),vec3(4.5f,1.0f,4.5f))
                                         ,glm::mat4(1.0f),glm::mat4(1.0f), 10.0f);
+
+  list < Bullet< Shape<GLfloat *> > *  >  solidBullets;  
+
   pair<int,int> pos = {0,0};
-  bool escenario[N][M];
+  pair<int, int> actdir= {0,0};
+  int newState=GLFW_RELEASE,oldState=GLFW_RELEASE;
+  bool escenario[100][100];
   for(int i = 0 ;i < N ; ++i)
     for(int j = 0 ; j < M ; ++j)
       {
@@ -144,82 +150,19 @@ int main( void )
     TexturaRoca.bindTexture(TextureID,0,1,2);
 
 
-    // firstTraslationMatrix = glm::mat4(1.0f);
-    // for(int i = 0 ;i < N ; ++i)
-    //   {
-    //     for(int j = 0 ;  j < M ; ++j)
-    //       {
-    //         solidPlane.setTraslationMatrix(firstTraslationMatrix);
-    //         firstTraslationMatrix = glm::translate(firstTraslationMatrix,xMov);
-    //         MVP = Projection * View * solidPlane.modelMatrix;
-    //         glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
-    //       }
-    //     firstTraslationMatrix = glm::translate(firstTraslationMatrix,(-xMov*(M)));
-    //     firstTraslationMatrix = glm::translate(firstTraslationMatrix, zMov);
-    //   }
+
     MVP = Projection * View * solidPlane.modelMatrix;
     glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
     solidPlane.solidArt->bindBuffer(0,3,1,36);
-    // MVP = Projection * View * solidPlane.modelMatrix;
-
-    // Cubo->bindBuffer(0,3,1,36);
-
-    // MVP = Projection * View * glm::translate(glm::mat4(0.1f), glm::vec3(-5.5f, 2.0f, 0.0f)) * ScaleLarge;
-    // glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
-    // glUniform1f(forbidden,1);
-    // Cubo->bindBuffer(0,3,1,36);
-
-    // MVP = Projection * View * glm::translate(glm::mat4(0.1f), glm::vec3(0.0f , 2.0f, -5.5f)) * ScaleWidth;
-    // glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
-    // glUniform1f(forbidden,1);
-    // Cubo->bindBuffer(0,3,1,36);
     moveShape();
-    glm::mat4 modeloAux = glm::translate(solidSuzane.traslationMatrix , getTranslateMatrix() );
+    glm::mat4 modeloAux = glm::translate(solidSuzane.traslationMatrix , getTranslateMatrix());
     if(validatePosition(modeloAux,4.0,-4.0,4.5,-3.3)) // falta valida posiciones
       solidSuzane.setTraslationMatrix(modeloAux);
     else
-      {
-        cout << "dasdas\n";
-        glm::mat4 trasMatrix = solidSuzane.traslationMatrix;
-        if(modeloAux[3][0] >= 4.0)
-          {
-            if(pos.second + 1 < M and pos.second+1 >= 0  and
-               escenario[pos.first][pos.second+1] == 1)
-              {
-                ++pos.second;
-                solidSuzane.setTraslationMatrix(glm::translate(trasMatrix,glm::vec3(-7.5f,0.0f,0.0f)));
-              }
-          }
-        if(modeloAux[3][0] <= -4.0)
-          {
-            if(pos.second - 1 < M and pos.second-1 >= 0  and
-               escenario[pos.first][pos.second-1] == 1)
-              {
-                --pos.second;
-                solidSuzane.setTraslationMatrix(glm::translate(trasMatrix,glm::vec3(7.5f,0.0f,0.0f)));
-              }
-          }
-        if(modeloAux[3][2] <= -3.3)
-          {
-            if(pos.first-1 < N and pos.first-1 >=0 and
-               escenario[pos.first-1][pos.second])
-              {
-                --pos.first;
-                solidSuzane.setTraslationMatrix(glm::translate(trasMatrix,glm::vec3(0.0f,0.0f,7.5f)));
-              }
-          }
-        if(modeloAux[3][2] >= 4.5)
-          {
-            if(pos.first+1 < M and pos.first+1 >=0 and
-               escenario[pos.first+1][pos.second])
-              {
-                ++pos.first;
-                solidSuzane.setTraslationMatrix(glm::translate(trasMatrix,glm::vec3(0.0f,0.0f,-7.5f)));
-              }
-          }
-      }
+      solidSuzane.setTraslationMatrix(glm::translate(solidSuzane.traslationMatrix,
+                                      changeScenario(modeloAux,pos,escenario, N ,M)));
     solidSuzane.setRotationMatrix(getRotationMatrix());
-    
+    actdir = getDirection();
     glUniform1f(forbidden,0);
     MVP = Projection * View * solidSuzane.modelMatrix;
     // glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
@@ -229,13 +172,35 @@ int main( void )
     solidSuzane.solidArt->bindModel(0,TextureID,0,1,2);
     // glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
     // MVP = Projection * View * Modelo * Traslacion *  Rotacion * ScaleMini; // * Rotacion ;
-    // if(cnt == 99)    cout << glm::to_string( solidSuzane.modelMatrix ) << "\n";
+    if(cnt == 599)    
+      {
+        cout << "Del Mono\n";
+        cout << glm::to_string( solidSuzane.modelMatrix ) << "\n";
+        cout << "Del Plano\n";
+        cout << glm::to_string( solidPlane.modelMatrix ) << "\n"; 
+      }
     // Susana.bindModel(0,TextureID,0,1,// 2);-*
 
-    if(glfwGetKey(window, GLFW_KEY_SPACE ) == GLFW_PRESS)
-      cout << "sos igual" << "\n";
+    newState = glfwGetKey(window, GLFW_KEY_SPACE );
+    
+    if(newState == GLFW_PRESS and oldState == GLFW_RELEASE)
+      {
+        solidBullets.push_back( new Bullet< Shape<GLfloat * > >(new Shape<GLfloat * >(TAMCUBE,verticesCube) , glm::scale(glm::mat4(1.0f),vec3(0.08f))
+                                ,glm::mat4(1.0f), solidSuzane.traslationMatrix  , 10.0f, actdir ) );
+      }
+    oldState = newState;
+    //Drawing Bullets
+    for(auto it = solidBullets.begin() ; it != solidBullets.end() ; ++it)
+      {
+        // cout << (*it)->dir.first << " " << (*it)->dir.second << "\n";
+        (*it)->setTraslationMatrix( glm::translate( (*it)->traslationMatrix, glm::vec3( (*it)->dir.first * 0.1, 0.0f , (*it)->dir.second * 0.1 ) ) );
+        MVP =  Projection * View * (*it)->modelMatrix;
+        glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
+        (*it)->solidArt->bindBuffer(0,3,1,36);
+      }
+    
     deactivateAttribs(3);
-    cnt = (cnt + 1)%100;
+    cnt = (cnt + 1)%600;
     // Swap buffers
     glfwSwapBuffers(window);
 

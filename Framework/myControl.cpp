@@ -4,6 +4,7 @@ extern GLFWwindow* window;
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 using namespace glm;
+using namespace std;
 
 #include "myControl.hpp"
 
@@ -11,6 +12,7 @@ glm::mat4 ViewMatrix;
 glm::mat4 ProjectionMatrix;
 glm::mat4 RotationMatrix;
 glm::vec3 TranslateVector;
+pair<int , int > direction;
 // glm::mat4 ModelMatrix;
 
 glm::mat4 getViewMatrix(){
@@ -112,17 +114,115 @@ void moveShape(){
   if (glfwGetKey( window, GLFW_KEY_UP ) == GLFW_PRESS){
     TranslateVector =  toDown;
     RotationMatrix = glm::rotate(glm::mat4(1.0f),3.2f,glm::vec3(0,1,0));
+    direction = {0,-1};
   }
   if (glfwGetKey( window, GLFW_KEY_DOWN ) == GLFW_PRESS){
     TranslateVector =  toUp;
     RotationMatrix = glm::rotate(glm::mat4(1.0f),0.0f,glm::vec3(0,1,0));
+    direction = {0,1};
   }
   if (glfwGetKey( window, GLFW_KEY_RIGHT ) == GLFW_PRESS){
     TranslateVector =  toRight;
     RotationMatrix = glm::rotate(glm::mat4(1.0f),1.5f,glm::vec3(0,1,0));
+    direction = {1,0};
   }
   if (glfwGetKey( window, GLFW_KEY_LEFT ) == GLFW_PRESS){
     TranslateVector =  toLeft;
     RotationMatrix = glm::rotate(glm::mat4(1.0f),4.7f,glm::vec3(0,1,0));
+    direction = {-1,0};
   }
+}
+
+
+bool validate(bool ** escenario , pair<int,int> pos, int N , int M )
+{
+  if(pos.second  < M and pos.second >= 0 and
+     pos.first < N and pos.first >= 0 and
+     escenario[pos.first][pos.second] == 1)
+    return 1;
+  return 0;
+}
+
+pair<int,int> getDirection()
+{
+  return direction;
+}
+
+glm::vec3 changeScenario( glm::mat4 modeloAux , pair < int , int >  & pos,
+                          bool escenario[100][100] , int N , int M)
+{
+  if(modeloAux[3][0] >= 4.0)
+    {
+      if(pos.second + 1 < M and pos.second+1 >= 0  and
+         escenario[pos.first][pos.second+1] == 1)
+        {
+          ++pos.second;
+          return glm::vec3(-7.5f,0.0f,0.0f);
+        }
+    }
+  if(modeloAux[3][0] <= -4.0)
+    {
+      if(pos.second - 1 < M and pos.second-1 >= 0  and
+         escenario[pos.first][pos.second-1] == 1)
+        {
+          --pos.second;
+          return glm::vec3(7.5f,0.0f,0.0f);
+        }
+    }
+  if(modeloAux[3][2] <= -3.3)
+    {
+      if(pos.first-1 < N and pos.first-1 >=0 and
+         escenario[pos.first-1][pos.second])
+        {
+          --pos.first;
+          return glm::vec3(0.0f,0.0f,7.5f);
+        }
+    }
+  if(modeloAux[3][2] >= 4.5)
+    {
+      if(pos.first+1 < M and pos.first+1 >=0 and
+         escenario[pos.first+1][pos.second])
+        {
+          ++pos.first;
+          return glm::vec3(0.0f,0.0f,-7.5f);
+        }
+    }
+
+
+  // float limits[] = {4.0 , -4.0 , -3.3 , 4.5};
+  // pair< int, int > direction = { {1,0} , {-1,0} , {0,1} , {0,-1} };
+  // pair< int, int > rec = { {3,0} , {3,0} , {3,2} , {3,2} };
+  // float movings = 7.8f;
+  // glm::vec3 answers { glm::vec3(-movings,0.0f, 0.0f),glm::vec3(movings, 0.0f , 0.0f) ,
+  //     glm::vec3(0.0f,0.0f,movings) , glm::vec3(0.0f, 0.0f , -movings)      };
+  // for(int i = 0 ; i < 4; ++i)
+  //   {
+  //     if(limits[i] > 0 )
+  //       {
+  //         if(modeloAux[rec[i].first][rec[i].second] >= limits[i])
+  //           {
+  //             if(validate(escenario, {pos.first + direction[i].first ,
+  //                     pos.second + direction[i].second  }, N, M ))
+  //               {
+  //                 pos.first += direction[i].first;
+  //                 pos.second+= direction[i].second;
+  //                 return answers[i];
+  //               }
+  //           }
+  //       }
+  //     else
+  //       {
+  //         if(modeloAux[rec[i].first][rec[i].second] <= limits[i])
+  //           {
+  //             if(validate(escenario, {pos.first + direction[i].first ,
+  //                     pos.second + direction[i].second  }, N, M ))
+  //               {
+  //                 pos.first += direction[i].first;
+  //                 pos.second+= direction[i].second;
+  //                 return answers[i];
+  //               }
+  //           }
+  //       }
+  //   }
+  // return glm::vec3(0.0f);
 }
