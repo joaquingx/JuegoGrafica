@@ -1,0 +1,1 @@
+/usr/bin/c++  -fPIC -g  -shared -Wl,-soname,libmyArt.so -o libmyArt.so CMakeFiles/myArt.dir/Framework/myArt.cpp.o 

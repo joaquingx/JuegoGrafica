@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <iostream>
 #include <list>
+#include <time.h>
 // Include GLEW
 #include <GL/glew.h>
 // Include GLFW
@@ -21,9 +22,9 @@ using namespace glm;
 #include "Resources/verticesArt.cpp"
 #include "Framework/myArt.hpp"
 #include "Framework/myPhisics.cpp"
+#include "Framework/myMap.cpp"
 
-const int TAMCUBE = 432, N = 3, M = 3 ;
-
+const int TAMCUBE = 432, N = 5, M = 5;
 
 GLFWwindow * window;
 GLuint VertexArrayID;
@@ -34,8 +35,11 @@ GLuint VertexArrayID;
 
 int main( void )
 {
-  //Aux Varibales
+  //Aux Varibales;
+  srand(time(NULL));
   int cnt = 0 ;
+  Map mapa(rand() % 50000);
+  mapa.generateMap();
   init("Trabajo Final", 1500 , 1200 ,window,VertexArrayID);
   // Create and compile our GLSL program from the shaders
   GLuint programID = LoadShaders( "../Resources/GameVertexShader.vertexshader", "../Resources/GameFragmentShader.fragmentshader" );
@@ -83,28 +87,30 @@ int main( void )
   Solid< Shape<GLfloat *> >  solidPlane(new Shape<GLfloat * >(TAMCUBE,verticesCube),glm::scale(glm::mat4(1.0f),vec3(4.5f,1.0f,4.5f))
                                         ,glm::mat4(1.0f),glm::mat4(1.0f), 10.0f);
 
-  list < Bullet< Shape<GLfloat *> > *  >  solidBullets;  
 
+  list < Bullet< Shape<GLfloat *> > *  >  solidBullets;
   pair<int,int> pos = {0,0};
   pair<int, int> actdir= {0,0};
   int newState=GLFW_RELEASE,oldState=GLFW_RELEASE;
   bool escenario[100][100];
-  for(int i = 0 ;i < N ; ++i)
+  /*bool escenario[N][M];
+    for(int i = 0 ;i < N ; ++i)
     for(int j = 0 ; j < M ; ++j)
-      {
-        if(rand() & 2)
-          escenario[i][j] = 1;
-        else
-          escenario[i][j] = 0;
-      }
-  escenario[0][0] = 1;
-
-  for(int i = 0 ;i < N ; ++i)
     {
-      for(int j = 0 ; j < M ; ++j)
-        cout << escenario[i][j] << " ";
-      cout << "\n";
+    if(rand() & 2)
+    escenario[i][j] = 1;
+    else
+    escenario[i][j] = 0;
     }
+    escenario[0][0] = 1;*/
+
+  mapa.printMap();
+  /*for(int i = 0 ;i < N ; ++i)
+    {
+    for(int j = 0 ; j < M ; ++j)
+    cout << escenario[i][j] << " ";
+    cout << "\n";
+    }*/
   glm::vec3 xMov,zMov;
   xMov = glm::vec3(9.0f,0.0f,0.0f);
   zMov = glm::vec3(0.0f,0.0f,9.0f);
@@ -138,7 +144,7 @@ int main( void )
     glUniform1f(forbidden,1);
 
     glm::vec3 lightPos = glm::vec3(4,4,4);
-    
+
     glUniform3f(LightID, lightPos.x, lightPos.y, lightPos.z);
 
     activateAttribs(3);
@@ -160,7 +166,7 @@ int main( void )
       solidSuzane.setTraslationMatrix(modeloAux);
     else
       solidSuzane.setTraslationMatrix(glm::translate(solidSuzane.traslationMatrix,
-                                      changeScenario(modeloAux,pos,escenario, N ,M)));
+                                                     changeScenario(modeloAux,pos,mapa.dungeon, N ,M)));
     solidSuzane.setRotationMatrix(getRotationMatrix());
     actdir = getDirection();
     glUniform1f(forbidden,0);
@@ -172,21 +178,21 @@ int main( void )
     solidSuzane.solidArt->bindModel(0,TextureID,0,1,2);
     // glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
     // MVP = Projection * View * Modelo * Traslacion *  Rotacion * ScaleMini; // * Rotacion ;
-    if(cnt == 599)    
+    if(cnt == 599)
       {
         cout << "Del Mono\n";
         cout << glm::to_string( solidSuzane.modelMatrix ) << "\n";
         cout << "Del Plano\n";
-        cout << glm::to_string( solidPlane.modelMatrix ) << "\n"; 
+        cout << glm::to_string( solidPlane.modelMatrix ) << "\n";
       }
     // Susana.bindModel(0,TextureID,0,1,// 2);-*
 
     newState = glfwGetKey(window, GLFW_KEY_SPACE );
-    
+
     if(newState == GLFW_PRESS and oldState == GLFW_RELEASE)
       {
         solidBullets.push_back( new Bullet< Shape<GLfloat * > >(new Shape<GLfloat * >(TAMCUBE,verticesCube) , glm::scale(glm::mat4(1.0f),vec3(0.08f))
-                                ,glm::mat4(1.0f), solidSuzane.traslationMatrix  , 10.0f, actdir ) );
+                                                                ,glm::mat4(1.0f), solidSuzane.traslationMatrix  , 10.0f, actdir ) );
       }
     oldState = newState;
     //Drawing Bullets
@@ -198,7 +204,7 @@ int main( void )
         glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
         (*it)->solidArt->bindBuffer(0,3,1,36);
       }
-    
+
     deactivateAttribs(3);
     cnt = (cnt + 1)%600;
     // Swap buffers

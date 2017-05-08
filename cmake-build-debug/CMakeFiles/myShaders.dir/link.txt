@@ -1,0 +1,1 @@
+/usr/bin/c++  -fPIC -g  -shared -Wl,-soname,libmyShaders.so -o libmyShaders.so CMakeFiles/myShaders.dir/Framework/myShaders.cpp.o 

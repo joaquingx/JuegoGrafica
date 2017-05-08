@@ -1,0 +1,1 @@
+/usr/bin/c++  -fPIC -g  -shared -Wl,-soname,libverticesArt.so -o libverticesArt.so CMakeFiles/verticesArt.dir/Resources/verticesArt.cpp.o 

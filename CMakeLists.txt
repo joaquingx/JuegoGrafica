@@ -49,6 +49,7 @@ add_library(myObjectLoader SHARED ${LIBSRC}/myObjectLoader.cpp)
 add_library(myArt SHARED ${LIBSRC}/myArt.cpp)
 add_library(myPhisics SHARED ${LIBSRC}/myPhisics.cpp)
 add_library(verticesArt SHARED ${RSRC}/verticesArt.cpp)
+add_library(myMap SHARED ${LIBSRC}/myMap.cpp)
 
 set(ALL_LIBS
   ${OPENGL_LIBRARY}
@@ -62,6 +63,7 @@ set(ALL_LIBS
   verticesArt
   myArt
   myPhisics
+        myMap
   )
 
 add_executable(Final
@@ -79,6 +81,7 @@ add_executable(Final
   Framework/myArt.hpp
   Framework/myArt.cpp
   Framework/myPhisics.cpp
+        Framework/myMap.cpp
   # Resources/verticesArt.cpp
   Resources/TransformVertexShader.vertexshader
   Resources/ColorFragmentShader.fragmentshader

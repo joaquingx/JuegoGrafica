@@ -7,6 +7,7 @@ using namespace glm;
 using namespace std;
 
 #include "myControl.hpp"
+#include "myMap.cpp"
 
 glm::mat4 ViewMatrix;
 glm::mat4 ProjectionMatrix;
@@ -149,12 +150,12 @@ pair<int,int> getDirection()
 }
 
 glm::vec3 changeScenario( glm::mat4 modeloAux , pair < int , int >  & pos,
-                          bool escenario[100][100] , int N , int M)
+                          Nodo * escenario[100][100] , int N , int M)
 {
   if(modeloAux[3][0] >= 4.0)
     {
       if(pos.second + 1 < M and pos.second+1 >= 0  and
-         escenario[pos.first][pos.second+1] == 1)
+         escenario[pos.first][pos.second+1]->mAllowable)
         {
           ++pos.second;
           return glm::vec3(-7.5f,0.0f,0.0f);
@@ -163,7 +164,7 @@ glm::vec3 changeScenario( glm::mat4 modeloAux , pair < int , int >  & pos,
   if(modeloAux[3][0] <= -4.0)
     {
       if(pos.second - 1 < M and pos.second-1 >= 0  and
-         escenario[pos.first][pos.second-1] == 1)
+         escenario[pos.first][pos.second-1]->mAllowable)
         {
           --pos.second;
           return glm::vec3(7.5f,0.0f,0.0f);
@@ -172,7 +173,7 @@ glm::vec3 changeScenario( glm::mat4 modeloAux , pair < int , int >  & pos,
   if(modeloAux[3][2] <= -3.3)
     {
       if(pos.first-1 < N and pos.first-1 >=0 and
-         escenario[pos.first-1][pos.second])
+         escenario[pos.first-1][pos.second]->mAllowable)
         {
           --pos.first;
           return glm::vec3(0.0f,0.0f,7.5f);
@@ -181,13 +182,12 @@ glm::vec3 changeScenario( glm::mat4 modeloAux , pair < int , int >  & pos,
   if(modeloAux[3][2] >= 4.5)
     {
       if(pos.first+1 < M and pos.first+1 >=0 and
-         escenario[pos.first+1][pos.second])
+         escenario[pos.first+1][pos.second]->mAllowable)
         {
           ++pos.first;
           return glm::vec3(0.0f,0.0f,-7.5f);
         }
     }
-
 
   // float limits[] = {4.0 , -4.0 , -3.3 , 4.5};
   // pair< int, int > direction = { {1,0} , {-1,0} , {0,1} , {0,-1} };
