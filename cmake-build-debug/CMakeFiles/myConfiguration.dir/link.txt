@@ -1,0 +1,1 @@
+/usr/bin/c++  -fPIC -g  -shared -Wl,-soname,libmyConfiguration.so -o libmyConfiguration.so CMakeFiles/myConfiguration.dir/Framework/myConfiguration.cpp.o 

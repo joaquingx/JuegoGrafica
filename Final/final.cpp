@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <iostream>
+#include <time.h>
 // Include GLEW
 #include <GL/glew.h>
 // Include GLFW
@@ -20,8 +21,9 @@ using namespace glm;
 #include "Resources/verticesArt.cpp"
 #include "Framework/myArt.hpp"
 #include "Framework/myPhisics.cpp"
+#include "Framework/myMap.cpp"
 
-const int TAMCUBE = 432, N = 3, M = 3;
+const int TAMCUBE = 432, N = 5, M = 5;
 
 
 GLFWwindow * window;
@@ -33,8 +35,11 @@ GLuint VertexArrayID;
 
 int main( void )
 {
-  //Aux Varibales
+  //Aux Varibales;
+    srand(time(NULL));
   int cnt = 0 ;
+  Map mapa(rand() % 5000);
+  mapa.generateMap();
   init("Trabajo Final", 1500 , 1200 ,window,VertexArrayID);
   // Create and compile our GLSL program from the shaders
   GLuint programID = LoadShaders( "../Resources/GameVertexShader.vertexshader", "../Resources/GameFragmentShader.fragmentshader" );
@@ -81,8 +86,8 @@ int main( void )
   // Solid< Shape<GLfloat *> >  solidPlane(new Shape<GLfloat * >(TAMCUBE,verticesCube),glm::mat4(1.0f),10.0f);
   Solid< Shape<GLfloat *> >  solidPlane(new Shape<GLfloat * >(TAMCUBE,verticesCube),glm::scale(glm::mat4(1.0f),vec3(4.5f,1.0f,4.5f))
                                         ,glm::mat4(1.0f),glm::mat4(1.0f), 10.0f);
-  pair<int,int> pos = {0,0};
-  bool escenario[N][M];
+  pair<int,int> pos = make_pair(0,0);
+  /*bool escenario[N][M];
   for(int i = 0 ;i < N ; ++i)
     for(int j = 0 ; j < M ; ++j)
       {
@@ -91,14 +96,15 @@ int main( void )
         else
           escenario[i][j] = 0;
       }
-  escenario[0][0] = 1;
+  escenario[0][0] = 1;*/
 
-  for(int i = 0 ;i < N ; ++i)
+  mapa.printMap();
+  /*for(int i = 0 ;i < N ; ++i)
     {
       for(int j = 0 ; j < M ; ++j)
         cout << escenario[i][j] << " ";
       cout << "\n";
-    }
+    }*/
   glm::vec3 xMov,zMov;
   xMov = glm::vec3(9.0f,0.0f,0.0f);
   zMov = glm::vec3(0.0f,0.0f,9.0f);
@@ -179,12 +185,11 @@ int main( void )
       solidSuzane.setTraslationMatrix(modeloAux);
     else
       {
-        cout << "dasdas\n";
         glm::mat4 trasMatrix = solidSuzane.traslationMatrix;
         if(modeloAux[3][0] >= 4.0)
           {
             if(pos.second + 1 < M and pos.second+1 >= 0  and
-               escenario[pos.first][pos.second+1] == 1)
+               mapa.dungeon[pos.first][pos.second+1]->mAllowable)
               {
                 ++pos.second;
                 solidSuzane.setTraslationMatrix(glm::translate(trasMatrix,glm::vec3(-7.5f,0.0f,0.0f)));
@@ -193,7 +198,7 @@ int main( void )
         if(modeloAux[3][0] <= -4.0)
           {
             if(pos.second - 1 < M and pos.second-1 >= 0  and
-               escenario[pos.first][pos.second-1] == 1)
+               mapa.dungeon[pos.first][pos.second-1]->mAllowable)
               {
                 --pos.second;
                 solidSuzane.setTraslationMatrix(glm::translate(trasMatrix,glm::vec3(7.5f,0.0f,0.0f)));
@@ -202,7 +207,7 @@ int main( void )
         if(modeloAux[3][2] <= -3.3)
           {
             if(pos.first-1 < N and pos.first-1 >=0 and
-               escenario[pos.first-1][pos.second])
+               mapa.dungeon[pos.first-1][pos.second]->mAllowable)
               {
                 --pos.first;
                 solidSuzane.setTraslationMatrix(glm::translate(trasMatrix,glm::vec3(0.0f,0.0f,7.5f)));
@@ -211,7 +216,7 @@ int main( void )
         if(modeloAux[3][2] >= 4.5)
           {
             if(pos.first+1 < M and pos.first+1 >=0 and
-               escenario[pos.first+1][pos.second])
+               mapa.dungeon[pos.first+1][pos.second]->mAllowable)
               {
                 ++pos.first;
                 solidSuzane.setTraslationMatrix(glm::translate(trasMatrix,glm::vec3(0.0f,0.0f,-7.5f)));
