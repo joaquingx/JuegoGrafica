@@ -89,6 +89,9 @@ public:
         randY2 = rand() % n;
       }
     dungeon[randX2][randY2]->idx = 2;
+    cout << "La llave esta : " << randX << " "  << randY  << "\n";
+    cout << "El Cuarto blanco esta  : " << randX2 << " "  << randY2  << "\n";
+
   }
 
   inline bool validPlace(pii& ant)

@@ -186,7 +186,7 @@ int main( void )
 
     if(mapa.dungeon[pos.first][pos.second]->idx == 1 and !tengoLaLlave)
       {
-        solidKey = new Solid< Shape<GLfloat *>  >(new Shape<GLfloat * >(TAMCUBE,verticesCube),glm::scale(glm::mat4(1.0f),vec3(0.5f)),glm::translate(glm::mat4(1.0f),glm::vec3(0.0f,2.0f,0.0f))
+        solidKey = new Solid< Shape<GLfloat *>  >(new Shape<GLfloat * >(TAMCUBE,verticesCube),glm::scale(glm::mat4(1.0f),vec3(0.4f)),glm::translate(glm::mat4(1.0f),glm::vec3(0.0f,2.0f,0.0f))
                                                   ,glm::mat4(1.0f), 10.0f);
         // cout << "entre papirrin\n";
         // glUniform1f(forbidden,2);
@@ -234,12 +234,13 @@ int main( void )
     solidSuzane.solidArt->bindModel(0,TextureID,0,1,2);
     // glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
     // MVP = Projection * View * Modelo * Traslacion *  Rotacion * ScaleMini; // * Rotacion ;
-    if(cnt == 599)
+    if(cnt == 199)
       {
-        cout << "Del Mono\n";
-        cout << glm::to_string( solidSuzane.modelMatrix ) << "\n";
-        cout << "Del Plano\n";
-        cout << glm::to_string( solidPlane.modelMatrix ) << "\n";
+        cout << "Estoy en la posicion " << pos.first << " " << pos.second << "\n";
+        // cout << "Del Mono\n";
+        // cout << glm::to_string( solidSuzane.modelMatrix ) << "\n";
+        // cout << "Del Plano\n";
+        // cout << glm::to_string( solidPlane.modelMatrix ) << "\n";
       }
     // Susana.bindModel(0,TextureID,0,1,// 2);-*
 
@@ -299,7 +300,8 @@ int main( void )
           float xKey = solidKey->modelMatrix[3][0], zKey = solidKey->modelMatrix[3][2];
           if( validateCollision(xSuzane , zSuzane, xKey , zKey, 1.5 ) )
             {
-              cout << "COlision\n";
+              // cout << "COlision\n";
+              // cout << "Coli"
               solidKey = 0;
               tengoLaLlave = 1;
             }
@@ -332,7 +334,7 @@ int main( void )
       }
 
     deactivateAttribs(3);
-    cnt = (cnt + 1)%600;
+    cnt = (cnt + 1)%200;
     // Swap buffers
     glfwSwapBuffers(window);
 
