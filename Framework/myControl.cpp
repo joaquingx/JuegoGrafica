@@ -150,7 +150,7 @@ pair<int,int> getDirection()
 }
 
 glm::vec3 changeScenario( glm::mat4 modeloAux , pair < int , int >  & pos,
-                          Nodo * escenario[5][5] , int N , int M)
+                          Nodo * escenario[3][3] , int N , int M)
 {
   if(modeloAux[3][0] >= 4.0)
     {
@@ -226,4 +226,14 @@ glm::vec3 changeScenario( glm::mat4 modeloAux , pair < int , int >  & pos,
   //       }
   //   }
   // return glm::vec3(0.0f);
+}
+
+
+bool validateCollision(float xBullet , float zBullet, float xEnemy , float zEnemy , float sizeRadius)
+{
+  if(xEnemy - sizeRadius <= xBullet and xEnemy + sizeRadius >= xBullet
+     and  zEnemy - sizeRadius <= zBullet  and  zEnemy + sizeRadius >= zBullet)
+    return 1;
+  return 0;
+
 }

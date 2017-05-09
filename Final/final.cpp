@@ -24,7 +24,7 @@ using namespace glm;
 #include "Framework/myPhisics.cpp"
 #include "Framework/myMap.cpp"
 
-const int TAMCUBE = 432, N = 5, M = 5;
+const int TAMCUBE = 432, N = 3, M = 3;
 
 GLFWwindow * window;
 GLuint VertexArrayID;
@@ -40,6 +40,7 @@ int main( void )
   int cnt = 0 ;
   Map mapa(rand() % 50000);
   mapa.generateMap();
+  mapa.assignKeys();
   init("Trabajo Final", 1500 , 1200 ,window,VertexArrayID);
   // Create and compile our GLSL program from the shaders
   GLuint programID = LoadShaders( "../Resources/GameVertexShader.vertexshader", "../Resources/GameFragmentShader.fragmentshader" );
@@ -88,6 +89,10 @@ int main( void )
                                         ,glm::mat4(1.0f),glm::mat4(1.0f), 10.0f);
 
 
+  list < Solid< Shape<GLfloat *> >  * > solidEnemy;
+
+
+
   list < Bullet< Shape<GLfloat *> > *  >  solidBullets;
   pair<int,int> pos = {0,0};
   pair<int, int> actdir= {0,1};
@@ -120,6 +125,8 @@ int main( void )
   //Solids Models.
   Solid< Model< vector< glm::vec3 > , vector< glm::vec2 > > > solidSuzane( new Model< vector< glm::vec3 >, vector< glm::vec2 > >(resObj,resTexture) ,
                                                                            glm::scale(glm::mat4(1.0f),vec3(0.4f)),glm::mat4(1.0f),glm::translate(glm::mat4(1.0f),glm::vec3(1.0f,2.0f,1.0f)) , 5.0f);
+
+  Solid< Shape<GLfloat *> >   * solidKey = 0;
   // Solid< Model< vector< glm::vec3 > , vector< glm::vec2 > > > solidSuzane( new Model< vector< glm::vec3 >, vector< glm::vec2 > >(resObj,resTexture) ,
   //                                                                          glm::mat4(1.0f),glm::mat4(1.0f),glm::mat4(1.0f), 5.0f);
   // solidSuzane.solidArt = new Model(resObj,resTexture);
@@ -136,6 +143,18 @@ int main( void )
   GLuint LightID = glGetUniformLocation(programID, "LightPosition_worldspace");
   GLuint forbidden = glGetUniformLocation(programID, "forbidden");
 
+  float speed = 0.005f;
+  bool flag = 0, tengoLaLlave = 0;
+
+  solidBullets.clear();
+  for(int i = 0 ; i < mapa.dungeon[pos.first][pos.second]->mEnemies.size() ; ++i)
+    {
+      float myX = float(mapa.dungeon[pos.first][pos.second]->mEnemies[i].first);
+      float myZ = float(mapa.dungeon[pos.first][pos.second]->mEnemies[i].second);
+      // cout << myX << " " << myZ;
+      solidEnemy.push_back(  new Solid< Shape<GLfloat *> >(new Shape<GLfloat * >(TAMCUBE,verticesCube),glm::scale(glm::mat4(1.0f),vec3(0.3f))
+                                                           ,glm::mat4(1.0f),glm::translate(glm::mat4(1.0f),glm::vec3(myX,2.0f,myZ)), 10.0f));
+    }
   do{
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -155,17 +174,55 @@ int main( void )
     TexturaRoca.bindTexture(TextureID,0,1,2);
 
 
+    if(mapa.dungeon[pos.first][pos.second]->idx ==  2)
+      {
+        if(tengoLaLlave)
+          {
+            cout << "Ganaste brou\n";
+            // return 0;
+          }
+        glUniform1f(forbidden,2);
+      }
 
+    if(mapa.dungeon[pos.first][pos.second]->idx == 1 and !tengoLaLlave)
+      {
+        solidKey = new Solid< Shape<GLfloat *>  >(new Shape<GLfloat * >(TAMCUBE,verticesCube),glm::scale(glm::mat4(1.0f),vec3(0.5f)),glm::translate(glm::mat4(1.0f),glm::vec3(0.0f,2.0f,0.0f))
+                                                  ,glm::mat4(1.0f), 10.0f);
+        // cout << "entre papirrin\n";
+        // glUniform1f(forbidden,2);
+      }
+    else
+      {
+        solidKey = 0;
+        // glUniform1f(forbidden,1);
+      }
     MVP = Projection * View * solidPlane.modelMatrix;
     glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
     solidPlane.solidArt->bindBuffer(0,3,1,36);
+
+    // MVP = Projection * View * solidEnemy.modelMatrix;
+    // glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
+    // solidEnemy.solidArt->bindBuffer(0,3,1,36);
+
     moveShape();
     glm::mat4 modeloAux = glm::translate(solidSuzane.traslationMatrix , getTranslateMatrix());
     if(validatePosition(modeloAux,4.0,-4.0,4.5,-3.3)) // falta valida posiciones
       solidSuzane.setTraslationMatrix(modeloAux);
-    else
-      solidSuzane.setTraslationMatrix(glm::translate(solidSuzane.traslationMatrix,
-                                                     changeScenario(modeloAux,pos,mapa.dungeon, N ,M)));
+    else // o es un limite o  me voy a otro escenario
+      {
+        solidSuzane.setTraslationMatrix(glm::translate(solidSuzane.traslationMatrix,
+                                                       changeScenario(modeloAux,pos,mapa.dungeon, N ,M)));
+        // cout << mapa.dungeon[pos.first][pos.second]->mEnemies.size() << "..gtam\n";
+        solidEnemy.clear();
+        for(int i = 0 ; i < mapa.dungeon[pos.first][pos.second]->mEnemies.size() ; ++i)
+          {
+            float myX = float(mapa.dungeon[pos.first][pos.second]->mEnemies[i].first);
+            float myZ = float(mapa.dungeon[pos.first][pos.second]->mEnemies[i].second);
+            // cout << myX << " " << myZ;
+            solidEnemy.push_back(  new Solid< Shape<GLfloat *> >(new Shape<GLfloat * >(TAMCUBE,verticesCube),glm::scale(glm::mat4(1.0f),vec3(0.3f))
+                                                                 ,glm::mat4(1.0f),glm::translate(glm::mat4(1.0f),glm::vec3(myX,2.0f,myZ)), 10.0f));
+          }
+      }
     solidSuzane.setRotationMatrix(getRotationMatrix());
     actdir = getDirection();
     glUniform1f(forbidden,0);
@@ -195,13 +252,83 @@ int main( void )
       }
     oldState = newState;
     //Drawing Bullets
-    for(auto it = solidBullets.begin() ; it != solidBullets.end() ; ++it)
+    for(auto it = solidBullets.begin() ; it != solidBullets.end() and (*it) != NULL ; ++it)
       {
         // cout << (*it)->dir.first << " " << (*it)->dir.second << "\n";
         (*it)->setTraslationMatrix( glm::translate( (*it)->traslationMatrix, glm::vec3( (*it)->dir.first * 0.1, 0.0f , (*it)->dir.second * 0.1 ) ) );
         MVP =  Projection * View * (*it)->modelMatrix;
         glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
         (*it)->solidArt->bindBuffer(0,3,1,36);
+        for(auto itEnemy = solidEnemy.begin() ; itEnemy != solidEnemy.end() and (*itEnemy) != NULL ; ++itEnemy)
+          {
+            float xBullet = (*it)->modelMatrix[3][0], zBullet = (*it)->modelMatrix[3][2];
+            float xEnemy = (*itEnemy)->modelMatrix[3][0], zEnemy = (*itEnemy)->modelMatrix[3][2];
+            if( validateCollision(xBullet , zBullet, xEnemy , zEnemy, 0.5 ) )
+              {
+                if(solidKey != 0)
+                  {
+                    flag = 1;
+                  }
+                if(itEnemy == solidEnemy.begin())
+                  {
+                    // cout << "soy el primero Enemy\n";
+                    solidEnemy.erase(itEnemy++);
+                    // itEnemy = solidEnemy.begin();
+                  }
+                else solidEnemy.erase(itEnemy--);
+                if(it == solidBullets.begin())
+                  {
+                    goto trampa;
+                  }
+                else
+                  solidBullets.erase(it--);
+              }
+
+          }
+      }
+  trampa:
+    if(flag)
+      if(solidKey != 0 )
+        {
+          glUniform1f(forbidden,3);
+          // cout << " kha\n";
+          MVP = Projection * View * solidKey->modelMatrix;
+          glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
+          solidKey->solidArt->bindBuffer(0,3,1,36);
+          float xSuzane = solidSuzane.modelMatrix[3][0], zSuzane = solidSuzane.modelMatrix[3][2];
+          float xKey = solidKey->modelMatrix[3][0], zKey = solidKey->modelMatrix[3][2];
+          if( validateCollision(xSuzane , zSuzane, xKey , zKey, 1.5 ) )
+            {
+              cout << "COlision\n";
+              solidKey = 0;
+              tengoLaLlave = 1;
+            }
+        }
+    glUniform1f(forbidden,0);
+    //Drawing Enemies
+    for(auto it = solidEnemy.begin() ; it != solidEnemy.end() ; ++it)
+      {
+        glm::mat4 enemyModel = (*it)->modelMatrix;
+        glm::mat4 suzaneModel = solidSuzane.modelMatrix;
+        glm::vec3 myEnemy = glm::vec3(enemyModel[3][0], enemyModel[3][1] , enemyModel[3][2]);
+        glm::vec3 myMonkey = glm::vec3(suzaneModel[3][0], suzaneModel[3][1], suzaneModel[3][2]);
+        glm::vec3 direct = glm::normalize(myMonkey-myEnemy);
+        // glm::vec3 direct = glm::normalize(myEnemy-myMonkey);
+        (*it)->setTraslationMatrix( glm::translate((*it)->traslationMatrix , (direct * speed)) );
+        MVP =  Projection * View * (*it)->modelMatrix;
+        glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
+        (*it)->solidArt->bindBuffer(0,3,1,36);
+        float xSuzane = solidSuzane.modelMatrix[3][0], zSuzane = solidSuzane.modelMatrix[3][2];
+        float xEnemy = (*it)->modelMatrix[3][0], zEnemy = (*it)->modelMatrix[3][2];
+        if( validateCollision(xSuzane , zSuzane, xEnemy , zEnemy, 0.5 ) )
+          {
+            cout << "Perdiste brou\n";
+            glfwTerminate();
+            return 0;
+          }
+        // if(solidKey != 0)
+        //   solidKey->modelMatrix = (*it)->modelMatrix;
+
       }
 
     deactivateAttribs(3);

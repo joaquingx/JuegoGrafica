@@ -14,7 +14,7 @@ out vec3 color;
 uniform sampler2D myTextureSampler;
 uniform mat4 MV;
 uniform vec3 LightPosition_worldspace;
-uniform bool  forbidden;
+uniform float  forbidden;
 
 void main(){
 
@@ -59,7 +59,9 @@ void main(){
   //   color = vec3(0.6,0,0);
   // else
   //   color = vec3(0.4,0,0);
-  if(forbidden) { color =    texture( myTextureSampler, UV ).rgb;}
+  if(forbidden == 3) { color = vec3(0,0,0);}
+  if(forbidden == 2) { color =  vec3(1,0.8,1); }
+  else  if(forbidden == 1) { color =    texture( myTextureSampler, UV ).rgb;}
   else
     color =
     // texture( myTextureSampler, UV ).rgb;

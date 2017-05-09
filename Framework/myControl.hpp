@@ -11,6 +11,7 @@ glm::mat4 getProjectionMatrix();
 glm::vec3 getTranslateMatrix();
 glm::mat4 getRotationMatrix();
 bool validatePosition(glm::mat4 Modelo, float maxX , float minX , float maxZ, float minZ);
-glm::vec3 changeScenario( glm::mat4 modeloAux , std::pair<int,int> & pos,Nodo * escenario[5][5], int N , int M);
+glm::vec3 changeScenario( glm::mat4 modeloAux , std::pair<int,int> & pos,Nodo * escenario[3][3], int N , int M);
 pair<int,int> getDirection();
+bool validateCollision(float xBullet , float zBullet, float xEnemy , float zEnemy , float sizeRadius);
 #endif
