@@ -83,7 +83,7 @@ public:
       }
     dungeon[randX][randY]->idx = 1;
 
-    while(!dungeon[randX2][randY2]->mAllowable)
+    while(!dungeon[randX2][randY2]->mAllowable or (randX == randX2 and randY == randY2) )
       {
         randX2 = rand() % n;
         randY2 = rand() % n;

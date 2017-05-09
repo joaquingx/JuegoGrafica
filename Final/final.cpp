@@ -89,6 +89,25 @@ int main( void )
                                         ,glm::mat4(1.0f),glm::mat4(1.0f), 10.0f);
 
 
+  glm::mat4 moverModelo = glm::translate(glm::mat4(1.0f), glm::vec3(-7.5f,1.0f,-7.5f) );
+  glm::vec3 xMov,zMov;
+  xMov = glm::vec3(1.0f,0.0f,0.0f);
+  zMov = glm::vec3(0.0f,0.0f,1.0f);
+  glm::mat4 firstTraslationMatrix = glm::mat4(1.0f);
+  Solid< Shape<GLfloat *> >   * solidMapping[N][N];
+  for(int i = 0 ; i < N ; ++i)
+    {
+      for(int j = 0 ; j < N ; ++j)
+      {
+        solidMapping[i][j] = new Solid< Shape <GLfloat * > > (new Shape<GLfloat * >(TAMCUBE,verticesCube),glm::scale(glm::mat4(1.0f),vec3(0.5f,0.2f,0.5f))
+                                                              ,glm::mat4(1.0f),firstTraslationMatrix, 10.0f);
+        firstTraslationMatrix = glm::translate( firstTraslationMatrix , xMov);
+      }
+      firstTraslationMatrix = glm::translate( firstTraslationMatrix , -xMov * N);
+      firstTraslationMatrix = glm::translate( firstTraslationMatrix , zMov );
+    }
+
+
   list < Solid< Shape<GLfloat *> >  * > solidEnemy;
 
 
@@ -115,10 +134,10 @@ int main( void )
     cout << escenario[i][j] << " ";
     cout << "\n";
     }*/
-  glm::vec3 xMov,zMov;
-  xMov = glm::vec3(9.0f,0.0f,0.0f);
-  zMov = glm::vec3(0.0f,0.0f,9.0f);
-  glm::mat4 firstTraslationMatrix = glm::mat4(1.0f);
+  // glm::vec3 xMov,zMov;
+  // xMov = glm::vec3(9.0f,0.0f,0.0f);
+  // zMov = glm::vec3(0.0f,0.0f,9.0f);
+  // glm::mat4 firstTraslationMatrix = glm::mat4(1.0f);
 
   // solidCube.solidArt = new Shape(TAMCUBE,verticesCube);
 
@@ -145,6 +164,7 @@ int main( void )
 
   float speed = 0.005f;
   bool flag = 0, tengoLaLlave = 0;
+
 
   solidBullets.clear();
   for(int i = 0 ; i < mapa.dungeon[pos.first][pos.second]->mEnemies.size() ; ++i)
@@ -291,10 +311,10 @@ int main( void )
     if(flag)
       if(solidKey != 0 )
         {
-          glUniform1f(forbidden,3);
           // cout << " kha\n";
           MVP = Projection * View * solidKey->modelMatrix;
           glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
+          // glUniform1f(forbidden,3);
           solidKey->solidArt->bindBuffer(0,3,1,36);
           float xSuzane = solidSuzane.modelMatrix[3][0], zSuzane = solidSuzane.modelMatrix[3][2];
           float xKey = solidKey->modelMatrix[3][0], zKey = solidKey->modelMatrix[3][2];
@@ -330,8 +350,21 @@ int main( void )
           }
         // if(solidKey != 0)
         //   solidKey->modelMatrix = (*it)->modelMatrix;
-
       }
+
+    //Drawing Map
+
+    for(int i = 0 ; i < N ; ++i)
+      for(int j = 0 ; j < N ; ++j)
+        {
+          MVP = Projection * View * moverModelo * solidMapping[i][j]->modelMatrix;
+          glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
+          glUniform1f(forbidden,4);
+          if(i == pos.first and j == pos.second)
+            glUniform1f(forbidden,3);
+          if(mapa.dungeon[i][j]->mAllowable)
+            solidMapping[i][j]->solidArt->bindBuffer(0,3,1,36);
+        }
 
     deactivateAttribs(3);
     cnt = (cnt + 1)%200;
