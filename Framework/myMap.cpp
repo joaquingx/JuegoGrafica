@@ -15,10 +15,10 @@ class Nodo
 {
 public:
   int idx;
-  vector<pii> mEnemies;
+  vector<pii> mEnemies,mWalls;
   bool mAllowable;
   int mVisited;
-  Nodo(bool allowable, int numEnemies, int idx = -1, int visited = 0)
+  Nodo(bool allowable, int numEnemies ,  int numWalls, int idx = -1, int visited = 0)
   {
     this->idx = idx;
     mAllowable = allowable;
@@ -27,6 +27,12 @@ public:
         int randX = (rand() % 7) - 3;
         int randZ = (rand() % 7) - 3;
         mEnemies.push_back(make_pair(randX,randZ));
+      }
+    for(int i = 0; i < numWalls; i++)
+      {
+        int randX = (rand() % 7) - 3;
+        int randZ = (rand() % 7) - 3;
+        mWalls.push_back(make_pair(randX,randZ));
       }
     mVisited = visited;
   }
@@ -54,6 +60,7 @@ public:
         for(int j = 0; j < n; j++)
           {
             int cEnemies = (rand() % 3) + 1;
+            int cWalls = (rand() % 3) + 1;
             // if( i == randX and j == randY)
             //   {
             //     int wIdx = rand() % (cEnemies + 1);
@@ -65,7 +72,7 @@ public:
             //     dungeon[i][j] = new Nodo(0,cEnemies,2);
             //   }
             // else
-              dungeon[i][j] = new Nodo(0,cEnemies);
+              dungeon[i][j] = new Nodo(0,cEnemies,cWalls);
           }
       }
   }

@@ -110,38 +110,16 @@ int main( void )
 
   list < Solid< Shape<GLfloat *> >  * > solidEnemy;
 
+  list < Solid< Shape<GLfloat *> >  * > solidWalls;
 
 
   list < Bullet< Shape<GLfloat *> > *  >  solidBullets;
   pair<int,int> pos = {0,0};
   pair<int, int> actdir= {0,1};
   int newState=GLFW_RELEASE,oldState=GLFW_RELEASE;
-  /*bool escenario[N][M];
-    for(int i = 0 ;i < N ; ++i)
-    for(int j = 0 ; j < M ; ++j)
-    {
-    if(rand() & 2)
-    escenario[i][j] = 1;
-    else
-    escenario[i][j] = 0;
-    }
-    escenario[0][0] = 1;*/
+
 
   mapa.printMap();
-  /*for(int i = 0 ;i < N ; ++i)
-    {
-    for(int j = 0 ; j < M ; ++j)
-    cout << escenario[i][j] << " ";
-    cout << "\n";
-    }*/
-  // glm::vec3 xMov,zMov;
-  // xMov = glm::vec3(9.0f,0.0f,0.0f);
-  // zMov = glm::vec3(0.0f,0.0f,9.0f);
-  // glm::mat4 firstTraslationMatrix = glm::mat4(1.0f);
-
-  // solidCube.solidArt = new Shape(TAMCUBE,verticesCube);
-
-  //Solids Models.
   Solid< Model< vector< glm::vec3 > , vector< glm::vec2 > > > solidSuzane( new Model< vector< glm::vec3 >, vector< glm::vec2 > >(resObj,resTexture) ,
                                                                            glm::scale(glm::mat4(1.0f),vec3(0.4f)),glm::mat4(1.0f),glm::translate(glm::mat4(1.0f),glm::vec3(1.0f,2.0f,1.0f)) , 5.0f);
 
@@ -162,7 +140,7 @@ int main( void )
   GLuint LightID = glGetUniformLocation(programID, "LightPosition_worldspace");
   GLuint forbidden = glGetUniformLocation(programID, "forbidden");
 
-  float speed = 0.005f;
+  float speed = 0.02f;
   bool flag = 0, tengoLaLlave = 0;
 
 
@@ -173,6 +151,15 @@ int main( void )
       float myZ = float(mapa.dungeon[pos.first][pos.second]->mEnemies[i].second);
       // cout << myX << " " << myZ;
       solidEnemy.push_back(  new Solid< Shape<GLfloat *> >(new Shape<GLfloat * >(TAMCUBE,verticesCube),glm::scale(glm::mat4(1.0f),vec3(0.3f))
+                                                           ,glm::mat4(1.0f),glm::translate(glm::mat4(1.0f),glm::vec3(myX,2.0f,myZ)), 10.0f));
+    }
+
+  solidWalls.clear();
+  for(int i = 0 ; i < mapa.dungeon[pos.first][pos.second]->mWalls.size() ; ++i)
+    {
+      float myX = float(mapa.dungeon[pos.first][pos.second]->mWalls[i].first);
+      float myZ = float(mapa.dungeon[pos.first][pos.second]->mWalls[i].second);
+      solidWalls.push_back( new Solid< Shape<GLfloat *> >(new Shape<GLfloat * >(TAMCUBE,verticesCube),glm::scale(glm::mat4(1.0f),vec3(0.6f))
                                                            ,glm::mat4(1.0f),glm::translate(glm::mat4(1.0f),glm::vec3(myX,2.0f,myZ)), 10.0f));
     }
   do{
@@ -220,27 +207,53 @@ int main( void )
     glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
     solidPlane.solidArt->bindBuffer(0,3,1,36);
 
-    // MVP = Projection * View * solidEnemy.modelMatrix;
+    // MVP = Projection * View * solidEnemy.modelMatrix
     // glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
     // solidEnemy.solidArt->bindBuffer(0,3,1,36);
 
     moveShape();
     glm::mat4 modeloAux = glm::translate(solidSuzane.traslationMatrix , getTranslateMatrix());
-    if(validatePosition(modeloAux,4.0,-4.0,4.5,-3.3)) // falta valida posiciones
+
+    bool collisionWithWall = 0;
+    // Collision with walls
+    for(auto it = solidWalls.begin() ; it != solidWalls.end() ; ++it)
+      {
+        // Collision with monkey
+        float xWall = (*it)->modelMatrix[3][0], zWall = (*it)->modelMatrix[3][2];
+       if( validateCollision(modeloAux[3][0],modeloAux[3][2], xWall , zWall,  0.88))
+          {
+            collisionWithWall=1;
+          }
+      }
+    bool validPosition = validatePosition(modeloAux,4.0,-4.0,4.5,-3.3);
+    if(validPosition and !collisionWithWall) // falta valida posiciones
       solidSuzane.setTraslationMatrix(modeloAux);
     else // o es un limite o  me voy a otro escenario
       {
+        bool regenerar;
         solidSuzane.setTraslationMatrix(glm::translate(solidSuzane.traslationMatrix,
-                                                       changeScenario(modeloAux,pos,mapa.dungeon, N ,M)));
+                                                       changeScenario(modeloAux,pos,mapa.dungeon, N ,M,regenerar)));
         // cout << mapa.dungeon[pos.first][pos.second]->mEnemies.size() << "..gtam\n";
-        solidEnemy.clear();
-        for(int i = 0 ; i < mapa.dungeon[pos.first][pos.second]->mEnemies.size() ; ++i)
+        if(regenerar)
           {
-            float myX = float(mapa.dungeon[pos.first][pos.second]->mEnemies[i].first);
-            float myZ = float(mapa.dungeon[pos.first][pos.second]->mEnemies[i].second);
-            // cout << myX << " " << myZ;
-            solidEnemy.push_back(  new Solid< Shape<GLfloat *> >(new Shape<GLfloat * >(TAMCUBE,verticesCube),glm::scale(glm::mat4(1.0f),vec3(0.3f))
-                                                                 ,glm::mat4(1.0f),glm::translate(glm::mat4(1.0f),glm::vec3(myX,2.0f,myZ)), 10.0f));
+            solidEnemy.clear();
+            solidWalls.clear();
+            for(int i = 0 ; i < mapa.dungeon[pos.first][pos.second]->mEnemies.size() ; ++i)
+              {
+                float myX = float(mapa.dungeon[pos.first][pos.second]->mEnemies[i].first);
+                float myZ = float(mapa.dungeon[pos.first][pos.second]->mEnemies[i].second);
+                // cout << myX << " " << myZ;
+                solidEnemy.push_back(  new Solid< Shape<GLfloat *> >(new Shape<GLfloat * >(TAMCUBE,verticesCube),glm::scale(glm::mat4(1.0f),vec3(0.3f))
+                                                                     ,glm::mat4(1.0f),glm::translate(glm::mat4(1.0f),glm::vec3(myX,2.0f,myZ)), 10.0f));
+              }
+            for(int i = 0 ; i < mapa.dungeon[pos.first][pos.second]->mWalls.size() ; ++i)
+              {
+                float myX = float(mapa.dungeon[pos.first][pos.second]->mWalls[i].first);
+                float myZ = float(mapa.dungeon[pos.first][pos.second]->mWalls[i].second);
+                // cout << myX << " " << myZ;
+                solidWalls.push_back(  new Solid< Shape<GLfloat *> >(new Shape<GLfloat * >(TAMCUBE,verticesCube),glm::scale(glm::mat4(1.0f),vec3(0.6f))
+                                                                     ,glm::mat4(1.0f),glm::translate(glm::mat4(1.0f),glm::vec3(myX,2.0f,myZ)), 10.0f));
+              }
           }
       }
     solidSuzane.setRotationMatrix(getRotationMatrix());
@@ -257,13 +270,7 @@ int main( void )
     if(cnt == 199)
       {
         cout << "Estoy en la posicion " << pos.first << " " << pos.second << "\n";
-        // cout << "Del Mono\n";
-        // cout << glm::to_string( solidSuzane.modelMatrix ) << "\n";
-        // cout << "Del Plano\n";
-        // cout << glm::to_string( solidPlane.modelMatrix ) << "\n";
       }
-    // Susana.bindModel(0,TextureID,0,1,// 2);-*
-
     newState = glfwGetKey(window, GLFW_KEY_SPACE );
 
     if(newState == GLFW_PRESS and oldState == GLFW_RELEASE)
@@ -272,6 +279,12 @@ int main( void )
                                                                 ,glm::mat4(1.0f), solidSuzane.traslationMatrix  , 10.0f, actdir ) );
       }
     oldState = newState;
+    for(auto it = solidWalls.begin();  it != solidWalls.end() ; ++it)
+      {
+        MVP = Projection * View * (*it)->modelMatrix;
+        glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
+        (*it)->solidArt->bindBuffer(0,3,1,36);
+      }
     //Drawing Bullets
     for(auto it = solidBullets.begin() ; it != solidBullets.end() and (*it) != NULL ; ++it)
       {
@@ -280,9 +293,23 @@ int main( void )
         MVP =  Projection * View * (*it)->modelMatrix;
         glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
         (*it)->solidArt->bindBuffer(0,3,1,36);
+        float xBullet = (*it)->modelMatrix[3][0], zBullet = (*it)->modelMatrix[3][2];
+        // Collision with walls
+        for(auto itWall = solidWalls.begin() ; itWall != solidWalls.end() ; ++itWall)
+          {
+            float xWall = (*itWall)->modelMatrix[3][0], zWall = (*itWall)->modelMatrix[3][2];
+            if( validateCollision(xBullet, zBullet, xWall , zWall,  0.88))
+              {
+                if(it == solidBullets.begin())
+                  {
+                    solidBullets.erase(it);
+                    goto trampa;
+                  }
+                solidBullets.erase(it--);
+              }
+          }
         for(auto itEnemy = solidEnemy.begin() ; itEnemy != solidEnemy.end() and (*itEnemy) != NULL ; ++itEnemy)
           {
-            float xBullet = (*it)->modelMatrix[3][0], zBullet = (*it)->modelMatrix[3][2];
             float xEnemy = (*itEnemy)->modelMatrix[3][0], zEnemy = (*itEnemy)->modelMatrix[3][2];
             if( validateCollision(xBullet , zBullet, xEnemy , zEnemy, 0.5 ) )
               {
@@ -299,6 +326,7 @@ int main( void )
                 else solidEnemy.erase(itEnemy--);
                 if(it == solidBullets.begin())
                   {
+                    solidBullets.erase(it);
                     goto trampa;
                   }
                 else
@@ -335,25 +363,35 @@ int main( void )
         glm::vec3 myEnemy = glm::vec3(enemyModel[3][0], enemyModel[3][1] , enemyModel[3][2]);
         glm::vec3 myMonkey = glm::vec3(suzaneModel[3][0], suzaneModel[3][1], suzaneModel[3][2]);
         glm::vec3 direct = glm::normalize(myMonkey-myEnemy);
+        float xSuzane = solidSuzane.modelMatrix[3][0], zSuzane = solidSuzane.modelMatrix[3][2];
+        float xEnemy = (*it)->modelMatrix[3][0], zEnemy = (*it)->modelMatrix[3][2];
         // glm::vec3 direct = glm::normalize(myEnemy-myMonkey);
-        (*it)->setTraslationMatrix( glm::translate((*it)->traslationMatrix , (direct * speed)) );
+        glm::mat4 nuevo = (*it)->modelMatrix;
+        // (*it)->setTraslationMatrix( glm::translate((*it)->traslationMatrix , (direct * speed)) );
+        nuevo = glm::translate( nuevo , (direct * 3 *  speed)) ;
+        bool collisionExist=0;
+        for(auto itWall = solidWalls.begin() ; itWall != solidWalls.end() ; ++itWall)
+          {
+            float xWall = (*itWall)->modelMatrix[3][0], zWall = (*itWall)->modelMatrix[3][2];
+            if(validateCollision(xWall,zWall,nuevo[3][0],nuevo[3][2],0.88))
+              {
+                collisionExist=1;
+              }
+          }
+        if(!collisionExist)
+          (*it)->setTraslationMatrix( glm::translate((*it)->traslationMatrix , (direct * speed)) );
         MVP =  Projection * View * (*it)->modelMatrix;
         glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
         (*it)->solidArt->bindBuffer(0,3,1,36);
-        float xSuzane = solidSuzane.modelMatrix[3][0], zSuzane = solidSuzane.modelMatrix[3][2];
-        float xEnemy = (*it)->modelMatrix[3][0], zEnemy = (*it)->modelMatrix[3][2];
         if( validateCollision(xSuzane , zSuzane, xEnemy , zEnemy, 0.5 ) )
           {
             cout << "Perdiste brou\n";
             glfwTerminate();
             return 0;
           }
-        // if(solidKey != 0)
-        //   solidKey->modelMatrix = (*it)->modelMatrix;
       }
 
     //Drawing Map
-
     for(int i = 0 ; i < N ; ++i)
       for(int j = 0 ; j < N ; ++j)
         {
@@ -386,3 +424,4 @@ int main( void )
 
   return 0;
 }
+
