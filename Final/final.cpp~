@@ -24,7 +24,7 @@ using namespace glm;
 #include "Framework/myPhisics.cpp"
 #include "Framework/myMap.cpp"
 
-const int TAMCUBE = 432;
+const int TAMCUBE = 432, N = 3, M = 3;
 
 GLFWwindow * window;
 GLuint VertexArrayID;
@@ -36,11 +36,9 @@ GLuint VertexArrayID;
 int main( void )
 {
   //Aux Varibales;
-  int free_spaces,N,M;
-  cin>>N>>M>>free_spaces;
   srand(time(NULL));
   int cnt = 0 ;
-  Map mapa(rand() % 50000, free_spaces, N, M);
+  Map mapa(rand() % 50000);
   mapa.generateMap();
   mapa.assignKeys();
   init("Trabajo Final", 1500 , 1200 ,window,VertexArrayID);
@@ -78,8 +76,8 @@ int main( void )
   // int myTime = rand() % 10000;
 
   char  resObj[50],resTexture[50], resTexturaRoca[50];
-  strcpy(resObj,"../Resources/hormiga.obj");// ya se que es inseguro :'(
-  strcpy(resTexture,"../Resources/hormiga.dds");// ya se que es inseguro :'(
+  strcpy(resObj,"../Resources/suzanne.obj");// ya se que es inseguro :'(
+  strcpy(resTexture,"../Resources/uvmap.DDS");// ya se que es inseguro :'(
   //strcpy(resTexturaRoca,"../Resources/textureroca.DDS");// ya se que es inseguro :'(
   // strcpy(resTexturaRoca,"../Resources/uvtemplate.DDS");// ya se que es inseguro :'(
   // GLuint TextureRocaID  = glGetUniformLocation(programID, "myTextureSampler");
@@ -96,10 +94,10 @@ int main( void )
   xMov = glm::vec3(1.0f,0.0f,0.0f);
   zMov = glm::vec3(0.0f,0.0f,1.0f);
   glm::mat4 firstTraslationMatrix = glm::mat4(1.0f);
-  Solid< Shape<GLfloat *> >   * solidMapping[N][M];
+  Solid< Shape<GLfloat *> >   * solidMapping[N][N];
   for(int i = 0 ; i < N ; ++i)
     {
-      for(int j = 0 ; j < M ; ++j)
+      for(int j = 0 ; j < N ; ++j)
       {
         solidMapping[i][j] = new Solid< Shape <GLfloat * > > (new Shape<GLfloat * >(TAMCUBE,verticesCube),glm::scale(glm::mat4(1.0f),vec3(0.5f,0.2f,0.5f))
                                                               ,glm::mat4(1.0f),firstTraslationMatrix, 10.0f);
@@ -395,7 +393,7 @@ int main( void )
 
     //Drawing Map
     for(int i = 0 ; i < N ; ++i)
-      for(int j = 0 ; j < M ; ++j)
+      for(int j = 0 ; j < N ; ++j)
         {
           MVP = Projection * View * moverModelo * solidMapping[i][j]->modelMatrix;
           glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);

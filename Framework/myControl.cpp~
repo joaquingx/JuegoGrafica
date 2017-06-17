@@ -151,7 +151,7 @@ pair<int,int> getDirection()
 
 
 glm::vec3 changeScenario( glm::mat4 modeloAux , pair < int , int >  & pos,
-                          vector< vector< Nodo *> > escenario , int N , int M, bool & cambio)
+                          Nodo * escenario[3][3] , int N , int M, bool & cambio)
 {
   cambio = 0;
   if(modeloAux[3][0] >= 4.0)
