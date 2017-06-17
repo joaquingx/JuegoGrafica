@@ -1,6 +1,7 @@
 # CMake entry point
 cmake_minimum_required (VERSION 2.6)
 project (TrabajoFinal)
+set(CMAKE_CXX_STANDARD 11)
 
 find_package(OpenGL REQUIRED)
 
@@ -50,6 +51,7 @@ add_library(myArt SHARED ${LIBSRC}/myArt.cpp)
 add_library(myPhisics SHARED ${LIBSRC}/myPhisics.cpp)
 add_library(verticesArt SHARED ${RSRC}/verticesArt.cpp)
 add_library(myMap SHARED ${LIBSRC}/myMap.cpp)
+add_library(myMaze SHARED ${LIBSRC}/myMaze.cpp)
 
 set(ALL_LIBS
   ${OPENGL_LIBRARY}
@@ -64,6 +66,7 @@ set(ALL_LIBS
   myArt
   myPhisics
         myMap
+	myMaze
   )
 
 add_executable(Final
@@ -82,6 +85,7 @@ add_executable(Final
   Framework/myArt.cpp
   Framework/myPhisics.cpp
         Framework/myMap.cpp
+	Framework/myMaze.cpp
   # Resources/verticesArt.cpp
   Resources/TransformVertexShader.vertexshader
   Resources/ColorFragmentShader.fragmentshader

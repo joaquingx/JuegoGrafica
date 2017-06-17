@@ -5,7 +5,6 @@
 #include <vector>
 #include <time.h>
 #include <unistd.h>
-#include "myMaze.cpp"
 
 using namespace std;
 
@@ -41,39 +40,24 @@ public:
 
 class Map{
 public:
-  //Nodo* dungeon[n][n];
-  vector<vector<Nodo*> > dungeon;
+  Nodo* dungeon[n][n];
   bool* place;
   pii wall[4];
   pii nonWall[4];
   long long int steps;
-  int m_free_spaces, n, m;
-  Map(long long int pasos, int free_spaces, int x, int y)
+  Map(long long int pasos)
   {
-    vector<Nodo*> line;
-    n = x;
-    m = y;
-    m_free_spaces = free_spaces;
     // generateMap();
     srand(time(NULL));
     wall[0] = make_pair(1,0); wall[1] = make_pair(0,1); wall[2] =  make_pair(-1,0); wall[3] = make_pair(0,-1);
     nonWall[0] = make_pair(0,-1); nonWall[1] =  make_pair(-1,0); nonWall[2] = make_pair(0,1); nonWall[3] = make_pair(1,0);
     steps = pasos;
-
-    for(int i = 0; i < n; i++){
-      line.clear();
-      for(int j = 0; j < m; j++){
-	line.push_back(NULL);
-      }
-      dungeon.push_back(line);
-    }
-    //cout<<dungeon.size()<<" "<<dungeon[0].size()<<endl;
     // int randX =  0;
     // int randY =  0;
     // cout << randX << " " << randY << "\n";
     for(int i = 0; i < n; i++)
       {
-        for(int j = 0; j < m; j++)
+        for(int j = 0; j < n; j++)
           {
             int cEnemies = (rand() % 3) + 1;
             int cWalls = (rand() % 3) + 1;
@@ -96,20 +80,20 @@ public:
   void assignKeys()
   {
     int randX =  rand() % n;
-    int randY =  rand() % m;
+    int randY =  rand() % n;
     int randX2 = rand() % n;
-    int randY2 = rand() % m;
+    int randY2 = rand() % n;
     while(!dungeon[randX][randY]->mAllowable)
       {
         randX = rand() % n;
-        randY = rand() % m;
+        randY = rand() % n;
       }
     dungeon[randX][randY]->idx = 1;
 
     while(!dungeon[randX2][randY2]->mAllowable or (randX == randX2 and randY == randY2) )
       {
         randX2 = rand() % n;
-        randY2 = rand() % m;
+        randY2 = rand() % n;
       }
     dungeon[randX2][randY2]->idx = 2;
     cout << "La llave esta : " << randX << " "  << randY  << "\n";
@@ -119,7 +103,7 @@ public:
 
   inline bool validPlace(pii& ant)
   {
-    return (ant.first < n and ant.second < m) && (ant.first > -1 && ant.second > -1);
+    return (ant.first < n and ant.second < n) && (ant.first > -1 && ant.second > -1);
   }
 
   pii DFS(pii start, int num)
@@ -166,7 +150,7 @@ public:
     vector<pii> endings;
     for(int i = 0; i < n; i++)
       {
-        for(int j = 0; j < m; j++)
+        for(int j = 0; j < n; j++)
           {
             if(dungeon[i][j]->mAllowable and dungeon[i][j]->mVisited == 0)
               {
@@ -184,8 +168,8 @@ public:
   }
   void generateMap()
   {
-    int i = 1, free_spaces = 0;
-    pii ant = make_pair(n/2,m/2), previous_ant;
+    int i = 1;
+    pii ant = make_pair(n/2,n/2), previous_ant;
     for(;steps > 0; steps--)
       {
         place = &(dungeon[ant.first][ant.second]->mAllowable);
@@ -217,78 +201,17 @@ public:
     dungeon[0][0]->mAllowable = 1;
     // cout<<"Acabo"<<endl;
     fix();
-
-    for(int i = 0; i < n; i++){
-      for(int j = 0; j < m; j++){
-	if(dungeon[i][j]->mAllowable) free_spaces++;
-      }
-    }
-
-    cout<<"espacios libres: "<<free_spaces<<endl;
-    cout<<"espacios todo: "<<m_free_spaces<<endl;
-    
-    vector<vector<bool> > new_map;
-    if(free_spaces > m_free_spaces){
-      cout<<"more free spaces"<<endl;
-      new_map = convert();
-      Grafo Graph;
-      free_spaces -= m_free_spaces;
-      cout<<"resta: "<<free_spaces<<endl;
-      printMap();
-
-      cout<<endl;
-      for(int i = 0; i < n; i++){
-	for(int j = 0; j < m; j++){
-	  cout<<new_map[i][j];
-	}
-	cout<<endl;
-      }
-      
-      Graph.DoItAll(new_map,free_spaces);
-      cout<<"s"<<endl;
-      new_map.clear();
-      new_map = Graph.endItAll();
-      for(int i = 0; i < n; i++){
-	for(int j = 0; j < m; j++){
-	  dungeon[i][j]->mAllowable = new_map[i][j];
-	}
-      }
-    }
-    
-    else if(free_spaces < m_free_spaces){
-      cout<<"entro!"<<endl;
-      for(int i = 0; i < n; i++)
-	for(int j = 0; j < m; j++)
-	  if(!dungeon[i][j]->mAllowable){
-	    dungeon[i][j]->mAllowable = 1;
-	    free_spaces++;
-	    if(free_spaces == m_free_spaces) return;
-	  }
-    }
   }
   void printMap()
   {
     for(int i = 0; i < n; i++)
       {
-        for(int j = 0; j < m; j++)
+        for(int j = 0; j < n; j++)
           {
             cout<<dungeon[i][j]->mAllowable;
           }
         cout<<endl;
       }
-  }
-
-  vector<vector<bool> > convert(){
-    vector<bool> line;
-    vector<vector<bool> > real_map;
-    for(int i = 0; i < n; i++){
-      line.clear();
-      for(int j = 0; j < m; j++){
-	line.push_back(dungeon[i][j]->mAllowable);
-      }
-      real_map.push_back(line);
-    }
-    return real_map;
   }
 
 };
