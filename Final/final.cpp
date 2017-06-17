@@ -76,8 +76,8 @@ int main( void )
   // int myTime = rand() % 10000;
 
   char  resObj[50],resTexture[50], resTexturaRoca[50];
-  strcpy(resObj,"../Resources/suzanne.obj");// ya se que es inseguro :'(
-  strcpy(resTexture,"../Resources/uvmap.DDS");// ya se que es inseguro :'(
+  strcpy(resObj,"../Resources/hormiga.obj");// ya se que es inseguro :'(
+  strcpy(resTexture,"../Resources/hormiga.dds");// ya se que es inseguro :'(
   //strcpy(resTexturaRoca,"../Resources/textureroca.DDS");// ya se que es inseguro :'(
   // strcpy(resTexturaRoca,"../Resources/uvtemplate.DDS");// ya se que es inseguro :'(
   // GLuint TextureRocaID  = glGetUniformLocation(programID, "myTextureSampler");
