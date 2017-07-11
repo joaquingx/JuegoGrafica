@@ -114,22 +114,22 @@ void moveShape(){
   glm::vec3 toRight = glm::vec3(0.1f,0.0f,0.0f);
   if (glfwGetKey( window, GLFW_KEY_UP ) == GLFW_PRESS){
     TranslateVector =  toDown;
-    RotationMatrix = glm::rotate(glm::mat4(1.0f),3.2f,glm::vec3(0,1,0));
+    RotationMatrix = glm::rotate(glm::mat4(1.0f),1.5f,glm::vec3(0,1,0));
     direction = {0,-1};
   }
   if (glfwGetKey( window, GLFW_KEY_DOWN ) == GLFW_PRESS){
     TranslateVector =  toUp;
-    RotationMatrix = glm::rotate(glm::mat4(1.0f),0.0f,glm::vec3(0,1,0));
+    RotationMatrix = glm::rotate(glm::mat4(1.0f),4.7f,glm::vec3(0,1,0));
     direction = {0,1};
   }
   if (glfwGetKey( window, GLFW_KEY_RIGHT ) == GLFW_PRESS){
     TranslateVector =  toRight;
-    RotationMatrix = glm::rotate(glm::mat4(1.0f),1.5f,glm::vec3(0,1,0));
+    RotationMatrix = glm::rotate(glm::mat4(1.0f),0.0f,glm::vec3(0,1,0));
     direction = {1,0};
   }
   if (glfwGetKey( window, GLFW_KEY_LEFT ) == GLFW_PRESS){
     TranslateVector =  toLeft;
-    RotationMatrix = glm::rotate(glm::mat4(1.0f),4.7f,glm::vec3(0,1,0));
+    RotationMatrix = glm::rotate(glm::mat4(1.0f),3.2f,glm::vec3(0,1,0));
     direction = {-1,0};
   }
 }

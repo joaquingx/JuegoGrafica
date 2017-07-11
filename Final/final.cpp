@@ -25,24 +25,79 @@ using namespace glm;
 #include "Framework/myMap.cpp"
 
 const int TAMCUBE = 432;
-
 GLFWwindow * window;
 GLuint VertexArrayID;
 
 
 // class cuarto
 
+void regenerateMap( list < Solid< Shape<GLfloat *> >  * > & solidWalls , Map  * mapa,   pair<int,int> & pos)
+{
+  solidWalls.clear();
+  for(int i = 0 ; i < mapa->dungeon[pos.first][pos.second]->mWalls.size() ; ++i)
+    {
+      float myX = float(mapa->dungeon[pos.first][pos.second]->mWalls[i].first);
+      float myZ = float(mapa->dungeon[pos.first][pos.second]->mWalls[i].second);
+      solidWalls.push_back( new Solid< Shape<GLfloat *> >(new Shape<GLfloat * >(TAMCUBE,verticesCube),glm::scale(glm::mat4(1.0f),vec3(0.6f))
+                                                          ,glm::mat4(1.0f),glm::translate(glm::mat4(1.0f),glm::vec3(myX,2.0f,myZ)), 10.0f));
+    }
+}
+
+void regenerateEnemies(list< Solid < Shape < GLfloat * > > * > & solidEnemy, Map * mapa, pair<int,int> & pos)
+{
+  for(int i = 0 ; i < mapa->dungeon[pos.first][pos.second]->mEnemies.size() ; ++i)
+    {
+      float myX = float(mapa->dungeon[pos.first][pos.second]->mEnemies[i].first);
+      float myZ = float(mapa->dungeon[pos.first][pos.second]->mEnemies[i].second);
+      // cout << myX << " " << myZ;
+      solidEnemy.push_back(  new Solid< Shape<GLfloat *> >(new Shape<GLfloat * >(TAMCUBE,verticesCube),glm::scale(glm::mat4(1.0f),vec3(0.3f))
+                                                           ,glm::mat4(1.0f),glm::translate(glm::mat4(1.0f),glm::vec3(myX,2.0f,myZ)), 10.0f));
+    }
+}
+
+void regenerateMiniMap(int N, int M , vector< vector < Solid< Shape<GLfloat *>  > *  > >  & solidMapping, Map * mapa)
+{
+  glm::vec3 xMov,zMov;
+  xMov = glm::vec3(1.0f,0.0f,0.0f);
+  zMov = glm::vec3(0.0f,0.0f,1.0f);
+  solidMapping.resize(N);
+  glm::mat4 firstTraslationMatrix = glm::mat4(1.0f);
+  for(int i = 0 ; i < N ; ++i)
+    {
+      solidMapping[i].resize(M);
+      for(int j = 0 ; j < M ; ++j)
+        {
+          solidMapping[i][j] = new Solid< Shape <GLfloat * > > (new Shape<GLfloat * >(TAMCUBE,verticesCube),glm::scale(glm::mat4(1.0f),vec3(0.5f,0.2f,0.5f))
+                                                                ,glm::mat4(1.0f),firstTraslationMatrix, 10.0f);
+          firstTraslationMatrix = glm::translate( firstTraslationMatrix , xMov);
+        }
+      firstTraslationMatrix = glm::translate( firstTraslationMatrix , -xMov * N);
+      firstTraslationMatrix = glm::translate( firstTraslationMatrix , zMov );
+    }
+}
+
+void reRandom(int & N , int & M  , int & free_spaces)
+{
+  N = rand() % 4 + 2;
+  M = rand() % 4 + 2;
+  free_spaces = rand() % (N*M);
+  // N = 2;
+  // M = 2;
+  // free_spaces = 3;
+}
 
 int main( void )
 {
+  int N, M, free_spaces;
   //Aux Varibales;
-  int free_spaces,N,M;
-  cin>>N>>M>>free_spaces;
+  // cin>>N>>M>>free_spaces;
   srand(time(NULL));
+  reRandom(N,M,  free_spaces);
   int cnt = 0 ;
-  Map mapa(rand() % 50000, free_spaces, N, M);
-  mapa.generateMap();
-  mapa.assignKeys();
+  Map * mapa;
+  mapa = new Map(rand() % 50000, free_spaces, N, M);
+  mapa->generateMap();
+  mapa->assignKeys();
   init("Trabajo Final", 1500 , 1200 ,window,VertexArrayID);
   // Create and compile our GLSL program from the shaders
   GLuint programID = LoadShaders( "../Resources/GameVertexShader.vertexshader", "../Resources/GameFragmentShader.fragmentshader" );
@@ -90,24 +145,8 @@ int main( void )
   Solid< Shape<GLfloat *> >  solidPlane(new Shape<GLfloat * >(TAMCUBE,verticesCube),glm::scale(glm::mat4(1.0f),vec3(4.5f,1.0f,4.5f))
                                         ,glm::mat4(1.0f),glm::mat4(1.0f), 10.0f);
 
-
   glm::mat4 moverModelo = glm::translate(glm::mat4(1.0f), glm::vec3(-7.5f,1.0f,-7.5f) );
-  glm::vec3 xMov,zMov;
-  xMov = glm::vec3(1.0f,0.0f,0.0f);
-  zMov = glm::vec3(0.0f,0.0f,1.0f);
-  glm::mat4 firstTraslationMatrix = glm::mat4(1.0f);
-  Solid< Shape<GLfloat *> >   * solidMapping[N][M];
-  for(int i = 0 ; i < N ; ++i)
-    {
-      for(int j = 0 ; j < M ; ++j)
-      {
-        solidMapping[i][j] = new Solid< Shape <GLfloat * > > (new Shape<GLfloat * >(TAMCUBE,verticesCube),glm::scale(glm::mat4(1.0f),vec3(0.5f,0.2f,0.5f))
-                                                              ,glm::mat4(1.0f),firstTraslationMatrix, 10.0f);
-        firstTraslationMatrix = glm::translate( firstTraslationMatrix , xMov);
-      }
-      firstTraslationMatrix = glm::translate( firstTraslationMatrix , -xMov * N);
-      firstTraslationMatrix = glm::translate( firstTraslationMatrix , zMov );
-    }
+  vector< vector < Solid< Shape<GLfloat *>  >  *  > > solidMapping;
 
 
   list < Solid< Shape<GLfloat *> >  * > solidEnemy;
@@ -121,7 +160,7 @@ int main( void )
   int newState=GLFW_RELEASE,oldState=GLFW_RELEASE;
 
 
-  mapa.printMap();
+  mapa->printMap();
   Solid< Model< vector< glm::vec3 > , vector< glm::vec2 > > > solidSuzane( new Model< vector< glm::vec3 >, vector< glm::vec2 > >(resObj,resTexture) ,
                                                                            glm::scale(glm::mat4(1.0f),vec3(0.4f)),glm::mat4(1.0f),glm::translate(glm::mat4(1.0f),glm::vec3(1.0f,2.0f,1.0f)) , 5.0f);
 
@@ -142,28 +181,17 @@ int main( void )
   GLuint LightID = glGetUniformLocation(programID, "LightPosition_worldspace");
   GLuint forbidden = glGetUniformLocation(programID, "forbidden");
 
-  float speed = 0.02f;
+  float speed = 0.01f;
   bool flag = 0, tengoLaLlave = 0;
 
 
   solidBullets.clear();
-  for(int i = 0 ; i < mapa.dungeon[pos.first][pos.second]->mEnemies.size() ; ++i)
-    {
-      float myX = float(mapa.dungeon[pos.first][pos.second]->mEnemies[i].first);
-      float myZ = float(mapa.dungeon[pos.first][pos.second]->mEnemies[i].second);
-      // cout << myX << " " << myZ;
-      solidEnemy.push_back(  new Solid< Shape<GLfloat *> >(new Shape<GLfloat * >(TAMCUBE,verticesCube),glm::scale(glm::mat4(1.0f),vec3(0.3f))
-                                                           ,glm::mat4(1.0f),glm::translate(glm::mat4(1.0f),glm::vec3(myX,2.0f,myZ)), 10.0f));
-    }
 
-  solidWalls.clear();
-  for(int i = 0 ; i < mapa.dungeon[pos.first][pos.second]->mWalls.size() ; ++i)
-    {
-      float myX = float(mapa.dungeon[pos.first][pos.second]->mWalls[i].first);
-      float myZ = float(mapa.dungeon[pos.first][pos.second]->mWalls[i].second);
-      solidWalls.push_back( new Solid< Shape<GLfloat *> >(new Shape<GLfloat * >(TAMCUBE,verticesCube),glm::scale(glm::mat4(1.0f),vec3(0.6f))
-                                                           ,glm::mat4(1.0f),glm::translate(glm::mat4(1.0f),glm::vec3(myX,2.0f,myZ)), 10.0f));
-    }
+  regenerateEnemies(solidEnemy,mapa,pos);
+  regenerateMap(solidWalls,mapa,pos);
+  regenerateMiniMap(N,M,solidMapping, mapa);
+
+  // vecotr esolidWin
   do{
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -183,17 +211,27 @@ int main( void )
     TexturaRoca.bindTexture(TextureID,0,1,2);
 
 
-    if(mapa.dungeon[pos.first][pos.second]->idx ==  2)
+    if(mapa->dungeon[pos.first][pos.second]->idx ==  2)
       {
         if(tengoLaLlave)
           {
+            reRandom(N,M,free_spaces);
+            mapa = new Map(rand() % 50000, free_spaces, N, M);
+            mapa->generateMap();
+            mapa->assignKeys();
+            pos = {0,0};
+            regenerateMap(solidWalls,mapa,pos);
+            regenerateMiniMap(N,M,solidMapping, mapa);
+            regenerateEnemies(solidEnemy,mapa,pos);
+            sleep(2.0);
+            tengoLaLlave = 0;
             cout << "Ganaste brou\n";
             // return 0;
           }
         glUniform1f(forbidden,2);
       }
 
-    if(mapa.dungeon[pos.first][pos.second]->idx == 1 and !tengoLaLlave)
+    if(mapa->dungeon[pos.first][pos.second]->idx == 1 and !tengoLaLlave)
       {
         solidKey = new Solid< Shape<GLfloat *>  >(new Shape<GLfloat * >(TAMCUBE,verticesCube),glm::scale(glm::mat4(1.0f),vec3(0.4f)),glm::translate(glm::mat4(1.0f),glm::vec3(0.0f,2.0f,0.0f))
                                                   ,glm::mat4(1.0f), 10.0f);
@@ -222,7 +260,7 @@ int main( void )
       {
         // Collision with monkey
         float xWall = (*it)->modelMatrix[3][0], zWall = (*it)->modelMatrix[3][2];
-       if( validateCollision(modeloAux[3][0],modeloAux[3][2], xWall , zWall,  0.88))
+        if( validateCollision(modeloAux[3][0],modeloAux[3][2], xWall , zWall,  0.88))
           {
             collisionWithWall=1;
           }
@@ -234,24 +272,24 @@ int main( void )
       {
         bool regenerar;
         solidSuzane.setTraslationMatrix(glm::translate(solidSuzane.traslationMatrix,
-                                                       changeScenario(modeloAux,pos,mapa.dungeon, N ,M,regenerar)));
-        // cout << mapa.dungeon[pos.first][pos.second]->mEnemies.size() << "..gtam\n";
+                                                       changeScenario(modeloAux,pos,mapa->dungeon, N ,M,regenerar)));
+        // cout << mapa->dungeon[pos.first][pos.second]->mEnemies.size() << "..gtam\n";
         if(regenerar)
           {
             solidEnemy.clear();
             solidWalls.clear();
-            for(int i = 0 ; i < mapa.dungeon[pos.first][pos.second]->mEnemies.size() ; ++i)
+            for(int i = 0 ; i < mapa->dungeon[pos.first][pos.second]->mEnemies.size() ; ++i)
               {
-                float myX = float(mapa.dungeon[pos.first][pos.second]->mEnemies[i].first);
-                float myZ = float(mapa.dungeon[pos.first][pos.second]->mEnemies[i].second);
+                float myX = float(mapa->dungeon[pos.first][pos.second]->mEnemies[i].first);
+                float myZ = float(mapa->dungeon[pos.first][pos.second]->mEnemies[i].second);
                 // cout << myX << " " << myZ;
                 solidEnemy.push_back(  new Solid< Shape<GLfloat *> >(new Shape<GLfloat * >(TAMCUBE,verticesCube),glm::scale(glm::mat4(1.0f),vec3(0.3f))
                                                                      ,glm::mat4(1.0f),glm::translate(glm::mat4(1.0f),glm::vec3(myX,2.0f,myZ)), 10.0f));
               }
-            for(int i = 0 ; i < mapa.dungeon[pos.first][pos.second]->mWalls.size() ; ++i)
+            for(int i = 0 ; i < mapa->dungeon[pos.first][pos.second]->mWalls.size() ; ++i)
               {
-                float myX = float(mapa.dungeon[pos.first][pos.second]->mWalls[i].first);
-                float myZ = float(mapa.dungeon[pos.first][pos.second]->mWalls[i].second);
+                float myX = float(mapa->dungeon[pos.first][pos.second]->mWalls[i].first);
+                float myZ = float(mapa->dungeon[pos.first][pos.second]->mWalls[i].second);
                 // cout << myX << " " << myZ;
                 solidWalls.push_back(  new Solid< Shape<GLfloat *> >(new Shape<GLfloat * >(TAMCUBE,verticesCube),glm::scale(glm::mat4(1.0f),vec3(0.6f))
                                                                      ,glm::mat4(1.0f),glm::translate(glm::mat4(1.0f),glm::vec3(myX,2.0f,myZ)), 10.0f));
@@ -402,7 +440,7 @@ int main( void )
           glUniform1f(forbidden,4);
           if(i == pos.first and j == pos.second)
             glUniform1f(forbidden,3);
-          if(mapa.dungeon[i][j]->mAllowable)
+          if(mapa->dungeon[i][j]->mAllowable)
             solidMapping[i][j]->solidArt->bindBuffer(0,3,1,36);
         }
 
@@ -426,4 +464,3 @@ int main( void )
 
   return 0;
 }
-
