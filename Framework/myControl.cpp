@@ -36,7 +36,7 @@ float horizontalAngle = 3.14f;
 float verticalAngle = 0.0f;
 float initialFoV = 45.0f;
 
-float speed = 10.0f; // 3 units / second
+float speed = 1.0f; // 3 units / second
 float mouseSpeed = 0.005f;
 
 

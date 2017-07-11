@@ -50,7 +50,6 @@ add_library(myObjectLoader SHARED ${LIBSRC}/myObjectLoader.cpp)
 add_library(myArt SHARED ${LIBSRC}/myArt.cpp)
 add_library(myPhisics SHARED ${LIBSRC}/myPhisics.cpp)
 add_library(verticesArt SHARED ${RSRC}/verticesArt.cpp)
-add_library(boids SHARED ${LIBSRC}/boids.cpp)
 add_library(myMap SHARED ${LIBSRC}/myMap.cpp)
 add_library(myMaze SHARED ${LIBSRC}/myMaze.cpp)
 
@@ -66,9 +65,8 @@ set(ALL_LIBS
   verticesArt
   myArt
   myPhisics
-  myMap
-  myMaze
-  boids
+        myMap
+	myMaze
   )
 
 add_executable(Final
@@ -85,11 +83,9 @@ add_executable(Final
   Framework/myObjectLoader.hpp
   Framework/myArt.hpp
   Framework/myArt.cpp
-  Framework/myPhisics.hpp
   Framework/myPhisics.cpp
-  Framework/myMap.cpp
-  Framework/myMaze.cpp
-  # Framework/boids.cpp
+        Framework/myMap.cpp
+	Framework/myMaze.cpp
   # Resources/verticesArt.cpp
   Resources/TransformVertexShader.vertexshader
   Resources/ColorFragmentShader.fragmentshader
