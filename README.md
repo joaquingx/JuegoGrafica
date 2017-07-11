@@ -10,4 +10,3 @@
   $ make Final
   $ ./Final
 ```
-# Boids
